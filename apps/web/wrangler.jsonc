@@ -10,15 +10,20 @@
     "binding": "ASSETS"
   },
   "vars": {
-    // Staging URL until the school hostname is connected; keep SITE_INDEXABLE off until launch.
+    // Demo domain (2026-11-05); keep SITE_INDEXABLE off until the school's own launch.
     "SITE_URL": "https://yassinekhiari.download",
     "SITE_INDEXABLE": "false"
   },
+  "routes": [
+    { "pattern": "yassinekhiari.download", "custom_domain": true },
+    { "pattern": "www.yassinekhiari.download", "custom_domain": true }
+  ],
 
   // The public site holds NO data bindings: everything it shows comes from maarif-api over
   // a private service binding (ARCHITECTURE.md section 2); src/app/api/[...path]/route.ts
   // forwards the browser's /api/* calls through it.
   "services": [{ "binding": "API", "service": "maarif-api" }]
-  // With R2 enabled (Workers Paid), the OpenNext page cache moves to R2:
+  // Pages are pre-rendered and CMS content loads in the browser, so no page cache is needed.
+  // If revalidation is added later, the OpenNext page cache can move to R2:
   //   "r2_buckets": [{ "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "maarif-next-cache" }]
 }

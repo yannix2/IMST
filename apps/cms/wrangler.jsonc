@@ -31,9 +31,13 @@
       "binding": "R2",
       "bucket_name": "maarif-media"
     }
-  ]
+  ],
 
-  // During the spike the admin runs on its workers.dev URL. At launch, set
-  // "workers_dev": false and add routes for /admin* and /cms-api* on the school hostname.
-  // Secret: PAYLOAD_SECRET (wrangler secret put PAYLOAD_SECRET).
+  // The admin lives on its own hostname (demo domain, 2026-11-05). No workers.dev URL, so the
+  // only public door to maarifcms is the admin login; maarif-api reaches it over the service
+  // binding. Secret: PAYLOAD_SECRET (set by the deploy workflow, never in this file).
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [{ "pattern": "cms.yassinekhiari.download", "custom_domain": true }],
+  "vars": { "PAYLOAD_PUBLIC_SERVER_URL": "https://cms.yassinekhiari.download" }
 }

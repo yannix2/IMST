@@ -59,6 +59,8 @@ Secrets (set with `wrangler secret put <NAME>` in the app folder):
 
 ## Deploy (order matters)
 
+**Normal path:** push to `main` (or run "Deploy to Cloudflare" in GitHub Actions). `.github/workflows/deploy.yml` builds on Linux and deploys the three Workers in order; its header lists the repository secrets it needs. Demo hostnames: site `https://yassinekhiari.download`, admin `https://cms.yassinekhiari.download/admin`; maarif-api has no public URL (the site forwards `/api/*` to it over the service binding). Manual steps, for reference:
+
 1. `maarif-cms`: `pnpm --filter @maarif/cms payload migrate` against the remote D1 (`NODE_ENV=production`), then `pnpm --filter @maarif/cms deploy:app`.
 2. `maarif-api`: `pnpm --filter @maarif/api deploy`.
 3. `maarif-web`: `pnpm --filter @maarif/web deploy` with `SITE_URL` set; `SITE_INDEXABLE=true` only in production.
