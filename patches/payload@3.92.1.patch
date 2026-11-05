@@ -1,0 +1,14 @@
+diff --git a/dist/auth/strategies/local/generatePasswordSaltHash.js b/dist/auth/strategies/local/generatePasswordSaltHash.js
+index 7eb8b1c2e274e5c58736c7b29a77424ed91de0fc..393a891b43a49635c31b86199d1897ab1f44cee2 100644
+--- a/dist/auth/strategies/local/generatePasswordSaltHash.js
++++ b/dist/auth/strategies/local/generatePasswordSaltHash.js
+@@ -2,7 +2,8 @@ import crypto from 'crypto';
+ import { ValidationError } from '../../../errors/index.js';
+ import { password } from '../../../fields/validations.js';
+ const currentPasswordHashPrefix = 'pbkdf2-sha256-v1:';
+-const currentPasswordHashIterations = 600000;
++// Cloudflare Workers cap PBKDF2 at 100000 iterations (maarif patch, see patches/README.md).
++const currentPasswordHashIterations = 100000;
+ const currentPasswordHashKeyLength = 32;
+ const legacyPasswordHashIterations = 25000;
+ const legacyPasswordHashKeyLength = 512;

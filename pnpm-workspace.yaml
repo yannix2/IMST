@@ -8,3 +8,5 @@ onlyBuiltDependencies:
   - workerd
   - sharp
   - unrs-resolver
+patchedDependencies:
+  payload@3.92.1: patches/payload@3.92.1.patch
