@@ -1,0 +1,454 @@
+@import "tailwindcss";
+@import "@maarif/tokens/tokens.css";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/*
+ * Light and dark (owner decision 2026-11-05). The theme switcher sets data-theme on <html>
+ * before the first paint; tokens.css redefines the theme roles (ground, surface, heading,
+ * ink, slate, rule, mist) for dark. shadcn's semantic roles are mapped onto those tokens
+ * below; components never carry raw colours. `dark:` means the switcher's dark theme, not
+ * the device setting, so a visitor's choice always wins.
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme inline {
+  --font-sans: var(--face-text);
+  --font-heading: var(--face-display);
+
+  /* Maarif palette as utilities: bg-navy, text-turquoise-ink, bg-level-primary, ... */
+  --color-navy: var(--navy);
+  --color-night: var(--night);
+  --color-turquoise: var(--turquoise);
+  --color-turquoise-ink: var(--turquoise-ink);
+  --color-level-kindergarten: var(--level-kindergarten);
+  --color-level-primary: var(--level-primary);
+  --color-level-secondary: var(--level-secondary);
+  --color-notice: var(--notice);
+  --color-mist: var(--mist);
+  --color-ink: var(--ink);
+  --color-slate: var(--slate);
+  --color-rule: var(--rule);
+  --color-on-plate-muted: var(--on-plate-muted);
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-heading: var(--heading);
+
+  /* shadcn semantic roles */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Depth (tokens.css): shadow-rest, shadow-raised, shadow-cta ... */
+  --shadow-rest: var(--depth-rest);
+  --shadow-rest-hover: var(--depth-rest-hover);
+  --shadow-raised: var(--depth-raised);
+  --shadow-cta: var(--depth-cta);
+  --shadow-cta-hover: var(--depth-cta-hover);
+  --shadow-station: var(--depth-station);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+}
+
+:root {
+  --background: var(--ground);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--surface);
+  --popover-foreground: var(--ink);
+  /* primary = the next step: turquoise plate, night text (5.4:1) */
+  --primary: var(--turquoise);
+  --primary-foreground: var(--night);
+  --secondary: var(--mist);
+  --secondary-foreground: var(--navy);
+  --muted: var(--mist);
+  --muted-foreground: var(--slate);
+  --accent: var(--mist);
+  --accent-foreground: var(--navy);
+  --destructive: var(--notice);
+  --border: var(--rule);
+  --input: var(--rule);
+  --ring: var(--turquoise-ink);
+  --radius: 1.125rem; /* shadcn's base radius = the tile radius; controls are pills (tokens.css) */
+}
+
+/*
+ * Faces by script (owner decision 2026-11-05). next/font exposes each family under a generated
+ * name (--font-bricolage, --font-figtree, --font-readex). Every element picks its face from its
+ * own language, so an Arabic name inside an English page, or a Turkish one inside an Arabic
+ * page, is always set in its own script's face. Arabic has one face for headlines and body.
+ */
+.font-root,
+.font-root :lang(en),
+.font-root :lang(fr),
+.font-root :lang(tr) {
+  --face-text: var(--font-figtree), Arial, sans-serif;
+  --face-display: var(--font-bricolage), var(--font-figtree), Arial, sans-serif;
+}
+.font-root:lang(ar),
+.font-root :lang(ar) {
+  /* Readex Pro carries the Arabic letters; Western digits and Latin words fall to Figtree. */
+  --face-text: var(--font-readex), var(--font-figtree), Tahoma, Arial, sans-serif;
+  --face-display: var(--face-text);
+}
+@layer base {
+  /* A font-family computed on <html> is inherited as a resolved value, so every element that
+     names its own language re-reads the face for it. Headlines take the display face. */
+  [lang] {
+    font-family: var(--face-text);
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  :is(h1, h2, h3, h4) [lang],
+  .font-heading {
+    font-family: var(--face-display);
+  }
+  h1 {
+    letter-spacing: var(--tracking-display);
+  }
+  h2 {
+    letter-spacing: var(--tracking-headline);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+    scrollbar-color: var(--slate) var(--mist);
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    caret-color: var(--turquoise-ink);
+  }
+  ::selection {
+    background: var(--turquoise);
+    color: var(--night);
+  }
+  a {
+    text-underline-offset: 0.2em;
+    text-decoration-thickness: 1px;
+  }
+  /* Focus: Turquoise Ink on light grounds (5.6:1); plates switch it to turquoise (3.6:1 on navy). */
+  :root {
+    --focus: var(--turquoise-ink);
+  }
+  .plate {
+    --focus: var(--turquoise);
+  }
+  :focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+  }
+  /* Phone numbers and ages line up and never mirror. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/*
+ * The page's one authored moment: the level lines draw along their route from the
+ * line's start (the inline start, so right-to-left in Arabic), then the stations appear.
+ * `scale` is its own property, so it never fights Tailwind's `translate` utilities.
+ */
+@keyframes line-draw {
+  from {
+    scale: 0 1;
+  }
+}
+@keyframes station-in {
+  from {
+    opacity: 0;
+  }
+}
+.line-draw {
+  transform-origin: left center;
+  animation: line-draw 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+[dir="rtl"] .line-draw {
+  transform-origin: right center;
+}
+.station-in {
+  animation: station-in 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* The three other scripts light up under the headline like a bilingual sign switching on.
+   The headline itself (the page's largest paint) never waits for an animation. */
+@keyframes script-in {
+  from {
+    opacity: 0;
+    translate: 0 0.3em;
+    filter: blur(3px);
+  }
+}
+.script-in {
+  animation: script-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Changing language flips the headline plate: a cross-document view transition, no JS.
+   Browsers without it simply navigate. */
+@view-transition {
+  navigation: auto;
+}
+.sign-headline {
+  view-transition-name: sign-headline;
+}
+::view-transition-old(sign-headline) {
+  animation: plate-out 200ms cubic-bezier(0.5, 0, 0.75, 0) both;
+}
+::view-transition-new(sign-headline) {
+  animation: plate-in 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+}
+/* Page to page (owner decision 2026-11-05): the header stays put, the metro trail stretches
+   to its new length, and the page content fades in rising slightly. */
+.site-header-bar {
+  view-transition-name: site-header;
+}
+.metro {
+  view-transition-name: metro;
+}
+::view-transition-group(metro) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+html:not(.theme-switching)::view-transition-old(root) {
+  animation: page-out 160ms ease-in both;
+}
+html:not(.theme-switching)::view-transition-new(root) {
+  animation: page-in 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes page-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+/* Area menus (popovers) take the page's text colour, not the browser's canvas text. */
+[popover] {
+  color: inherit;
+}
+@keyframes plate-out {
+  to {
+    opacity: 0;
+    transform: perspective(700px) rotateX(75deg);
+  }
+}
+@keyframes plate-in {
+  from {
+    opacity: 0;
+    transform: perspective(700px) rotateX(-75deg);
+  }
+}
+
+/* Smooth travel between anchors (Book a visit, the menu). Reduced motion turns it off below. */
+html {
+  scroll-behavior: smooth;
+}
+
+/*
+ * Scroll-linked, where the scroll itself means something: the admissions stations come up as
+ * the visitor travels down the route, and the closing Maarif line draws towards its station.
+ * Without scroll-driven animation support both are simply there.
+ */
+@keyframes station-pass {
+  from {
+    opacity: 0.25;
+    translate: 0 1.25rem;
+  }
+}
+@keyframes route-in {
+  from {
+    scale: 0 1;
+  }
+}
+.route-in {
+  transform-origin: left center;
+}
+[dir="rtl"] .route-in {
+  transform-origin: right center;
+}
+@supports (animation-timeline: view()) {
+  .station-pass {
+    animation: station-pass linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 90%;
+  }
+  .route-in {
+    animation: route-in linear both;
+    animation-timeline: view();
+    animation-range: entry 20% cover 45%;
+  }
+}
+
+/*
+ * Switching theme answers the press: the new theme opens as a circle from the switch
+ * (same-document view transition, set up in theme-toggle.tsx). Without support, or under
+ * reduced motion, the theme simply changes.
+ */
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0 at var(--reveal-x, 50%) var(--reveal-y, 0));
+  }
+  to {
+    clip-path: circle(var(--reveal-r, 150vmax) at var(--reveal-x, 50%) var(--reveal-y, 0));
+  }
+}
+html.theme-switching::view-transition-old(root) {
+  animation: none;
+}
+html.theme-switching::view-transition-new(root) {
+  animation: theme-reveal 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+html.theme-switching .sign-headline {
+  view-transition-name: none;
+}
+
+/*
+ * Hairline figures on the page ground (the hero is white in light, night navy in dark).
+ * On navy plates the figures keep their own plate palette (hairline-stage.tsx).
+ */
+.hairline-ground {
+  --hairline-plate: var(--ground);
+  --hairline-hi: var(--turquoise-ink);
+  --hairline-edge: var(--navy);
+  --hairline-mid: #7f9ab5;
+  --hairline-lo: #cfdbe5;
+  --hairline-stroke: 1.15;
+}
+[data-theme="dark"] .hairline-ground {
+  --hairline-hi: var(--turquoise);
+  --hairline-edge: #e8f0f6;
+  --hairline-mid: #8fb0cc;
+  --hairline-lo: #2f5378;
+}
+
+/*
+ * Rolling figures (rolling-figure.tsx): each digit is a strip 0-9 twice, moved by translate.
+ * With JavaScript the strips start at 0 and roll to their value once seen; without it, or
+ * under reduced motion, the value simply shows.
+ */
+.digit-col {
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+  line-height: 1;
+  vertical-align: top;
+}
+.digit-strip {
+  display: flex;
+  flex-direction: column;
+  translate: 0 calc(var(--d, 0) * -1em);
+  transition: translate 1100ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--delay, 0ms);
+}
+.digit-strip > span {
+  height: 1em;
+}
+html.js .digit-col:not([data-ready]) .digit-strip {
+  translate: 0 0;
+  transition: none;
+}
+.digit-strip[data-snap] {
+  transition: none;
+}
+
+/* Testimonials: each word of a new quote rises into place; the reel beside it drifts. */
+@keyframes word-rise {
+  from {
+    opacity: 0;
+    translate: 0 0.45em;
+    filter: blur(4px);
+  }
+}
+.word-rise {
+  animation: word-rise 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes reel {
+  to {
+    translate: 0 -50%;
+  }
+}
+.reel {
+  animation: reel 42s linear infinite;
+}
+.reel-reverse {
+  animation-direction: reverse;
+}
+.reel:hover,
+.reel-reverse:hover {
+  animation-play-state: paused;
+}
+
+/* Questions: the answer opens smoothly where the browser can animate to auto height. */
+.faq {
+  interpolate-size: allow-keywords;
+}
+.faq::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    content-visibility 320ms allow-discrete;
+}
+.faq[open]::details-content {
+  block-size: auto;
+}
+
+/* Sections far down the page skip layout and paint until they come near the screen. */
+.defer-paint {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 720px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+  .station-pass,
+  .route-in {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

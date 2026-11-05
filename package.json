@@ -1,0 +1,15 @@
+{
+  "name": "maarif-website",
+  "private": true,
+  "description": "International Maarif Schools of Tunisia website: public site (Next.js), API (Hono) and maarifcms (Payload) on Cloudflare Workers.",
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "lint": "pnpm -r --if-present lint",
+    "build": "pnpm -r --if-present build"
+  }
+}

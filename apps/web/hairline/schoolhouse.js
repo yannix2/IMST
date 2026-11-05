@@ -1,0 +1,161 @@
+/**
+ * Schoolhouse: a school of three wings on one rounded plinth, stepping down
+ * towards the viewer: Secondary (three storeys) at the back, Primary (two),
+ * Kindergarten (one) in front. Each wing has rows of windows, a door with a
+ * rounded head and a roof slab; the tallest carries a bell cupola. The wing
+ * under the pointer opens its door and lifts its roof; the others close,
+ * staggered outwards from it. At rest the Kindergarten door stands ajar.
+ * The read-out names the level. The slider is how far a door swings, in degrees.
+ *
+ * The pattern: discrete items (Riffle). Tweens, a stagger by distance, and a hit
+ * test on each wing's RESTING hull, nearest wing first, so a lifting roof or an
+ * opening door never changes the choice.
+ */
+const {
+  Cam, clamp, fillet, fit, hull, poly, proj, facing, rad, rings, rrect, prism,
+  tdone, tset, tval, tween, disposer, mk, solid, put, place, pointer, register,
+} = HL;
+
+const CODES = ["secondary", "primary", "kindergarten"];
+const FLOORS = [3, 2, 1];
+const X0 = [0, 44, 88], Y0 = [0, 5, 10];
+const W = 44, D = 40, BASE = 4, ST = 22, ROOF = 5, OVER = 2, LIFT = 17;
+const DOOR_U = 15.5, DW = 13, DH = 18, AJAR = 0.6;
+const H = FLOORS.map((f) => BASE + f * ST);
+
+/** The door in its own plane: s along its width from the hinge, v up; a rounded head. */
+const DOOR = fillet([[0, 0], [DW, 0], [DW, DH], [0, DH]], [0.6, 0.6, 5.5, 5.5]);
+
+/** Windows of wing i on its front face, as rounded rectangles in face coordinates (u along x, v up). */
+function windows(i) {
+  const out = [];
+  for (let s = 0; s < FLOORS[i]; s++) {
+    const z0 = BASE + s * ST + 6, z1 = z0 + 10;
+    const cols = s === 0 ? [[5, 12], [32, 39]] : [[5, 12], [18.5, 25.5], [32, 39]];
+    for (const [u0, u1] of cols) out.push(rrect(u0, z0, u1, z1, 1.6, 3));
+  }
+  return out;
+}
+
+/** Point-in-convex-polygon, for the rest hulls. */
+function inside(pt, poly2) {
+  let sign = 0;
+  for (let k = 0; k < poly2.length; k++) {
+    const [ax, ay] = poly2[k], [bx, by] = poly2[(k + 1) % poly2.length];
+    const c = (bx - ax) * (pt[1] - ay) - (by - ay) * (pt[0] - ax);
+    if (c !== 0) { if (sign === 0) sign = Math.sign(c); else if (Math.sign(c) !== sign) return false; }
+  }
+  return true;
+}
+
+function mount({ stage, svg, read }, value) {
+  const bag = disposer();
+  let swing = value;
+
+  // Fitted to the plinth, the cupola with its roof lifted and every door at its widest swing.
+  const C = Cam(45, 0.5, 1.62);
+  const box = [[-6, -6, 0], [138, 56, 0], [138, -6, 0], [-6, 56, 0], [22, 20, H[0] + ROOF + LIFT + 18]];
+  for (let i = 0; i < 3; i++) {
+    for (const deg of [45, 100]) {
+      const a = rad(deg);
+      box.push([X0[i] + DOOR_U + DW - DW * Math.cos(a), Y0[i] + D + DW * Math.sin(a), BASE + DH]);
+    }
+    box.push([X0[i] + W + OVER, Y0[i] - OVER, H[i] + ROOF + LIFT]);
+  }
+  fit(C, box, 200, 166);
+  const P = proj(C), front = facing(C);
+
+  const g = mk("g", {}, svg);
+  const [pr, pi] = rings(-6, -6, 138, 56, 8, 2);
+  put(solid(g), prism(P, front, pr, pi, 0, BASE));
+
+  const wings = [];
+  for (let i = 0; i < 3; i++) {
+    const x0 = X0[i], y0 = Y0[i], x1 = x0 + W, y1 = y0 + D;
+    const [br, bi] = rings(x0, y0, x1, y1, 4, 1.4);
+    put(solid(g), prism(P, front, br, bi, BASE, H[i]));
+    // Windows and the doorway sit on the front face (y = y1), which faces the viewer.
+    const onFace = (pts) => poly(pts.map((q) => P(x0 + q.u, y1, q.v)));
+    mk("path", { d: windows(i).map(onFace).join(""), class: "nf lo" }, g);
+    mk("path", { d: poly(DOOR.map(([s, v]) => P(x0 + DOOR_U + s, y1, BASE + v))), class: "nf lo" }, g);
+    const panel = mk("path", { class: "sil" }, g);
+    const knob = mk("circle", { r: 1.1, class: "dot off" }, g);
+    const roof = solid(g);
+    const [rr, ri] = rings(x0 - OVER, y0 - OVER, x1 + OVER, y1 + OVER, 5, 1.4);
+    const cup = i === 0 ? [solid(g), solid(g)] : null;
+    wings.push({ x0, y1, panel, knob, roof, rr, ri, cup, a: tween(i === 2 ? AJAR * swing : 0), z: tween(0), drawn: [NaN, NaN] });
+  }
+  const [cr0, ci0] = rings(X0[0] + 16, Y0[0] + 14, X0[0] + 28, Y0[0] + 26, 3, 1);
+  const [cr1, ci1] = rings(X0[0] + 14, Y0[0] + 12, X0[0] + 30, Y0[0] + 28, 4, 1.2);
+
+  function draw(i, ang, lift) {
+    const w = wings[i];
+    if (w.drawn[0] === ang && w.drawn[1] === lift) return;
+    w.drawn = [ang, lift];
+    const c = Math.cos(rad(ang)), s = Math.sin(rad(ang));
+    // Hinged on its right edge: half open, the door faces the viewer instead of showing its edge.
+    const at = (u, v) => P(w.x0 + DOOR_U + DW - u * c, w.y1 + u * s, BASE + v);
+    w.panel.setAttribute("d", poly(DOOR.map(([u, v]) => at(u, v))));
+    place(w.knob, at(DW - 2.6, DH * 0.45));
+    const top = H[i] + lift;
+    put(w.roof, prism(P, front, w.rr, w.ri, top, top + ROOF));
+    if (w.cup) {
+      put(w.cup[0], prism(P, front, cr0, ci0, top + ROOF, top + ROOF + 12));
+      put(w.cup[1], prism(P, front, cr1, ci1, top + ROOF + 12, top + ROOF + 16));
+    }
+  }
+
+  // Hit test: each wing's RESTING hull (body and closed roof), nearest wing first.
+  const hulls = wings.map((_w, i) => {
+    const [br] = rings(X0[i] - OVER, Y0[i] - OVER, X0[i] + W + OVER, Y0[i] + D + OVER, 5, 1.4);
+    return hull(br.map((q) => P(q.u, q.v, BASE)).concat(br.map((q) => P(q.u, q.v, H[i] + ROOF + (i === 0 ? 16 : 0)))));
+  });
+  const hit = (p) => { for (let i = 2; i >= 0; i--) if (inside(p, hulls[i])) return i; return -1; };
+
+  const B = register(stage, (_dt, now) => {
+    let moving = false;
+    wings.forEach((w, i) => {
+      draw(i, tval(w.a, now), tval(w.z, now));
+      if (!tdone(w.a, now) || !tdone(w.z, now)) moving = true;
+    });
+    return moving;
+  });
+  bag.add(B.unregister);
+
+  let act = -1;
+  function setActive(a, force) {
+    if (a === act && !force) return;
+    const now = performance.now(), from = a >= 0 ? a : act >= 0 ? act : 2;
+    act = a;
+    wings.forEach((w, i) => {
+      const delay = Math.abs(i - from) * 45;
+      const ang = a < 0 ? (i === 2 ? AJAR * swing : 0) : i === a ? swing : 0;
+      tset(w.a, clamp(ang, 0, 100), now, delay);
+      tset(w.z, i === a ? LIFT : 0, now, delay);
+      // One highlight: the chosen door; at rest, the Kindergarten door that stands ajar.
+      const lit = a < 0 ? i === 2 : i === a;
+      w.panel.classList.toggle("hi", lit);
+      w.knob.setAttribute("class", lit ? "dot" : "dot off");
+    });
+    read.textContent = a < 0 ? "rest" : CODES[a];
+    B.wake();
+  }
+  setActive(-1, true);
+
+  bag.add(pointer(stage, { move: (p) => setActive(hit(p)), leave: () => setActive(-1) }));
+  bag.add(() => svg.replaceChildren());
+
+  return {
+    set: (v) => { swing = v; setActive(act, true); },
+    destroy: bag.dispose,
+  };
+}
+
+hairline({
+  name: "schoolhouse",
+  means: "A school of three wings, one per level: the wing under the pointer opens its door and lifts its roof.",
+  rules: [1, 2, 5, 6],
+  range: [45, 70, 100],
+  tour: [[245, 205], [200, 150], [155, 95], null],
+  mount,
+});

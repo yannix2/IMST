@@ -1,0 +1,39 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "maarif-cms",
+  "compatibility_date": "2025-08-15",
+  "compatibility_flags": [
+    // Node.js APIs used by Payload
+    "nodejs_compat",
+    // fetch() may only reach public URLs
+    "global_fetch_strictly_public"
+  ],
+  "observability": { "enabled": true },
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+
+  // The ONLY Worker bound to the database (ARCHITECTURE.md section 2).
+  "d1_databases": [
+    {
+      "binding": "D1",
+      "database_id": "d58c0354-c333-4093-8309-377a67bb4dd0",
+      "database_name": "maarif-db",
+      "remote": true
+    }
+  ],
+
+  // Private bucket: no public URL; visitors get files through maarif-api.
+  "r2_buckets": [
+    {
+      "binding": "R2",
+      "bucket_name": "maarif-media"
+    }
+  ]
+
+  // During the spike the admin runs on its workers.dev URL. At launch, set
+  // "workers_dev": false and add routes for /admin* and /cms-api* on the school hostname.
+  // Secret: PAYLOAD_SECRET (wrangler secret put PAYLOAD_SECRET).
+}

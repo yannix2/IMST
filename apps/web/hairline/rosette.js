@@ -1,0 +1,154 @@
+/**
+ * Rosette: the Maarif symbol built as a low relief. A square heart with a
+ * diamond hole, four stems running out from it on the diagonals, and at the end
+ * of each stem two square meander hooks that curl back towards each other.
+ * Each arm (a stem and its two hooks) is one of the school's four languages.
+ * The arm under the pointer rises, its stem first and then its hooks bar by bar
+ * along the curl; the other arms settle. At rest the far arm stands raised.
+ * The read-out names the language. The slider is how high an arm rises.
+ *
+ * The pattern: discrete items (Riffle). Tweens, a stagger by distance along the
+ * arm and between arms, and a hit test on the ground plane at rest height, by
+ * quadrant, so a rising arm never changes the choice.
+ */
+const {
+  Cam, clamp, fillet, fit, hull, poly, proj, facing, rings, prism, unproj,
+  tdone, tset, tval, tween, disposer, mk, solid, put, pointer, register,
+} = HL;
+
+const CODES = ["fr", "ar", "tr", "en"];
+// Arm k sits at the corner (SX[k], SY[k]) * J of the heart's square; it owns that quadrant.
+const SX = [1, 1, -1, -1], SY = [-1, 1, 1, -1];
+const J = 56, W = 15, Hw = W / 2, R = 1.6, B = 1.2;
+const T = 7, HEART = 10, DROP = 0.8, REST_ARM = 3;
+const HEART_OUT = 19, HOLE = 8.5, STEM_IN = 32;
+
+/** A convex rounded polygon as a ring of samples {u, v, nu, nv}, and its crease ring inset by b. */
+function ngon(pts) {
+  const f = fillet(pts, pts.map(() => R), 3), n = f.length;
+  let cx = 0, cy = 0;
+  for (const [x, y] of f) { cx += x / n; cy += y / n; }
+  const ring = f.map(([x, y], i) => {
+    const [ax, ay] = f[(i - 1 + n) % n], [bx, by] = f[(i + 1) % n];
+    let nu = by - ay, nv = -(bx - ax);
+    const l = Math.hypot(nu, nv) || 1;
+    nu /= l; nv /= l;
+    if (nu * (x - cx) + nv * (y - cy) < 0) { nu = -nu; nv = -nv; }
+    return { u: x, v: y, nu, nv };
+  });
+  return [ring, ring.map((s) => ({ u: s.u - s.nu * B, v: s.v - s.nv * B, nu: s.nu, nv: s.nv }))];
+}
+
+/** The pieces of arm k, in the order they rise: the stem with its flared hub, then each hook's four bars. */
+function armPieces(k) {
+  const sx = SX[k], sy = SY[k];
+  // Work in the quadrant of arm 0 (x > 0, y < 0) and map: (x, y) -> (sx * x, -sy * y).
+  const m = ([x, y]) => [sx * x, -sy * y];
+  const box = (x0, y0, x1, y1) => {
+    const a = m([x0, y0]), b = m([x1, y1]);
+    return { ring: rings(Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[0], b[0]), Math.max(a[1], b[1]), R, B), cx: (a[0] + b[0]) / 2, cy: (a[1] + b[1]) / 2 };
+  };
+  const d = Math.SQRT1_2, s0 = STEM_IN;
+  // The stem runs on the diagonal and flares into the square hub where the hooks start.
+  const stem = [[s0 * d + Hw * d, -s0 * d + Hw * d], [s0 * d - Hw * d, -s0 * d - Hw * d],
+    [J - Hw, -J - Hw], [J + Hw, -J - Hw], [J + Hw, -J + Hw]].map(m);
+  const out = [{ ring: ngon(stem), cx: m([44, -44])[0], cy: m([44, -44])[1], step: 0 }];
+  // Hook A climbs out along -y, runs back along -x, drops along +y and curls along +x;
+  // hook B is its mirror across the stem's diagonal (x, y) -> (-y, -x).
+  const A = [[J - Hw, -J - Hw - 40, J + Hw, -J - Hw], [J - Hw - 42, -J - Hw - 40, J - Hw, -J - Hw - 25],
+    [J - Hw - 42, -J - Hw - 25, J - Hw - 27, -J - Hw + 5], [J - Hw - 27, -J - Hw - 10, J - Hw - 11, -J - Hw + 5]];
+  A.forEach(([x0, y0, x1, y1], i) => {
+    out.push({ ...box(x0, y0, x1, y1), step: i + 1 });
+    out.push({ ...box(-y1, -x1, -y0, -x0), step: i + 1 });
+  });
+  return out;
+}
+
+function mount({ stage, svg, read }, value) {
+  const bag = disposer();
+  let rise = value;
+
+  const C = Cam(45, 0.5, 1.3);
+  const ext = J + Hw + 42;
+  fit(C, [[-ext, -ext, 0], [ext, ext, 0], [ext, -ext, 0], [-ext, ext, 0], [-ext, -ext, T + 14], [0, 0, HEART]], 200, 166);
+  const P = proj(C), front = facing(C);
+  const g = mk("g", {}, svg);
+
+  const parts = [];
+  for (let k = 0; k < 4; k++) for (const p of armPieces(k)) parts.push({ ...p, arm: k, base: T - p.step * DROP });
+  // The heart: a rounded square slab with its diamond hole (a square in plan).
+  const heart = { ring: rings(-HEART_OUT, -HEART_OUT, HEART_OUT, HEART_OUT, 3, B), cx: 0, cy: 0, arm: -1, base: HEART, step: 0 };
+  parts.push(heart);
+  // Painted back to front: ascending x + y of each piece's centre.
+  parts.sort((a, b) => a.cx + a.cy - (b.cx + b.cy));
+  for (const p of parts) {
+    p.el = solid(g);
+    if (p === heart) p.hole = mk("path", { class: "lo" }, g);
+    p.z = tween(p.arm === REST_ARM ? rise * 0.7 : 0);
+    p.drawn = NaN;
+  }
+  const holeRing = rings(-HOLE, -HOLE, HOLE, HOLE, 1, 0.5)[0];
+
+  function draw(p, lift) {
+    if (p.drawn === lift) return;
+    p.drawn = lift;
+    const top = p.base + lift;
+    put(p.el, prism(P, front, p.ring[0], p.ring[1], 0, top));
+    if (p.hole) p.hole.setAttribute("d", poly(holeRing.map((q) => P(q.u, q.v, top))));
+  }
+
+  // Hit test at rest height: the pointer on the plane z = T picks the quadrant, so the arm it chose
+  // rising under it never moves the choice. The heart and the space outside the arms pick nothing.
+  const hit = (pt) => {
+    const [x, y] = unproj(C, pt[0], pt[1], T);
+    if (Math.max(Math.abs(x), Math.abs(y)) > ext + 6 || Math.max(Math.abs(x), Math.abs(y)) < HEART_OUT + 2) return -1;
+    for (let k = 0; k < 4; k++) if (Math.sign(x) === SX[k] && Math.sign(y) === SY[k]) return k;
+    return -1;
+  };
+
+  const L = register(stage, (_dt, now) => {
+    let moving = false;
+    for (const p of parts) {
+      draw(p, tval(p.z, now));
+      if (!tdone(p.z, now)) moving = true;
+    }
+    return moving;
+  });
+  bag.add(L.unregister);
+
+  let act = -2;
+  function setActive(a, force) {
+    if (a === act && !force) return;
+    const now = performance.now(), from = a >= 0 ? a : REST_ARM;
+    act = a;
+    for (const p of parts) {
+      if (p.arm < 0) continue;
+      const ring = Math.min(Math.abs(p.arm - from), 4 - Math.abs(p.arm - from));
+      const delay = (ring * 2 + p.step) * 40;
+      const up = a < 0 ? (p.arm === REST_ARM ? rise * 0.7 : 0) : p.arm === a ? rise : 0;
+      tset(p.z, clamp(up, 0, 14), now, delay);
+      // One highlight: the chosen arm's stem; at rest, the raised far arm's stem.
+      if (p.step === 0) p.el.sil.classList.toggle("hi", p.arm === (a < 0 ? REST_ARM : a));
+    }
+    read.textContent = a < 0 ? "rest" : CODES[a];
+    L.wake();
+  }
+  setActive(-1, true);
+
+  bag.add(pointer(stage, { move: (p) => setActive(hit(p)), leave: () => setActive(-1) }));
+  bag.add(() => svg.replaceChildren());
+
+  return {
+    set: (v) => { rise = v; setActive(act, true); },
+    destroy: bag.dispose,
+  };
+}
+
+hairline({
+  name: "rosette",
+  means: "The Maarif symbol as four arms joined at one heart, one per language: the arm under the pointer rises, hook by hook.",
+  rules: [1, 2, 5, 9],
+  range: [6, 10, 14],
+  tour: [[285, 168], [200, 212], [115, 168], null],
+  mount,
+});
