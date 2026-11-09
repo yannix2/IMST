@@ -22,7 +22,12 @@
   // The public site holds NO school-data bindings: everything it shows comes from maarif-api over
   // a private service binding (ARCHITECTURE.md section 2); src/app/api/[...path]/route.ts
   // forwards the browser's /api/* calls through it, and src/lib/cms.ts reads content for pages.
-  "services": [{ "binding": "API", "service": "maarif-api" }],
+  // WORKER_SELF_REFERENCE: the page-refresh queue (DOQueueHandler, open-next.config.ts) calls this
+  // Worker to regenerate a page; without it every page waiting for a refresh fails (2026-11-09).
+  "services": [
+    { "binding": "API", "service": "maarif-api" },
+    { "binding": "WORKER_SELF_REFERENCE", "service": "maarif-web" }
+  ],
 
   // Page cache for refresh on publish (wave 3, ADR 007, open-next.config.ts). Cache only:
   // rendered pages (R2), which pages are stale (D1, its own small database), and the queue that
