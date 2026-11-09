@@ -30,7 +30,7 @@ export function MobileNav({ locale, path = "" }: { locale: Locale; path?: string
       <Button
         id={`${id}-trigger`}
         variant="outline"
-        className="lg:hidden"
+        className="xl:hidden"
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={used ? id : undefined}

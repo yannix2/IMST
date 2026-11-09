@@ -15,8 +15,9 @@ import { ThemeToggle } from "./theme-toggle";
 // Each area opens a panel through the browser's own popover (no script: Escape and a click
 // outside close it, and the button reports its state). Page links are plain links, so moving
 // between pages is a document navigation that the view transition in globals.css animates.
-// lg and up: area menu and a compact language panel (the four tabs from 2xl); xl: Book a visit;
-// phones: the menu sheet. `path` is the current page ("" on Home).
+// xl and up: area menu (seven areas since wave 3) and a compact language panel (the four tabs
+// from 2xl); 2xl: Book a visit (it is also in every page's closing band); below xl: the menu sheet.
+// `path` is the current page ("" on Home).
 
 const panel =
   "fixed inset-x-0 border-0 top-[5.5rem] bottom-auto mx-auto w-[min(calc(100%-2*var(--gutter)),68rem)] rounded-[var(--radius-plate)] bg-surface p-6 text-ink shadow-raised ring-1 ring-rule/70";
@@ -34,14 +35,14 @@ export function SiteHeader({ locale, path = "" }: { locale: Locale; path?: strin
         <span className="max-w-[14rem] text-base font-bold leading-tight text-heading">{t.schoolName}</span>
       </a>
 
-      <nav aria-label={t.nav.menu} className="hidden lg:block">
-        <ul className="flex gap-1">
+      <nav aria-label={t.nav.menu} className="hidden xl:block">
+        <ul className="flex gap-0.5">
           {builtAreas.map((area) => {
             const head = pathOf(area.pages[0]!);
             const current = path === head || path.startsWith(`${head}/`);
             const pages = menuPages(area);
             const item = cn(
-              "inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 font-medium text-ink no-underline transition-colors hover:bg-mist hover:text-heading",
+              "inline-flex min-h-11 items-center gap-1 whitespace-nowrap rounded-full px-3 font-medium text-ink no-underline transition-colors hover:bg-mist hover:text-heading",
               current && "bg-mist text-heading",
             );
             if (pages.length === 0) {
@@ -91,7 +92,7 @@ export function SiteHeader({ locale, path = "" }: { locale: Locale; path?: strin
 
       <div className="flex items-center gap-2 sm:gap-3">
         <LanguageTabs locale={locale} label={t.nav.language} className="hidden 2xl:block" tone="ground" path={path} />
-        <div className="hidden lg:block 2xl:hidden">
+        <div className="hidden xl:block 2xl:hidden">
           <button
             type="button"
             popoverTarget="menu-language"
@@ -121,7 +122,7 @@ export function SiteHeader({ locale, path = "" }: { locale: Locale; path?: strin
           </div>
         </div>
         <ThemeToggle label={t.nav.theme} />
-        <CtaSpark className="hidden xl:inline-flex">
+        <CtaSpark className="hidden 2xl:inline-flex">
           <Button asChild>
             <a href={visit}>
               <CalendarCheckIcon data-icon="inline-start" />
