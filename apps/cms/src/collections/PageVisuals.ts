@@ -26,7 +26,8 @@ export const PageVisuals: CollectionConfig = {
       name: 'slots',
       label: 'Photos inside the page',
       type: 'array',
-      maxRows: 24,
+      // Home alone uses 29 places (levels, life, Cambridge, journey); room to grow.
+      maxRows: 40,
       fields: [
         { name: 'slot', type: 'text', required: true, maxLength: 60, admin: { description: 'Place name used by the page. Every inner page: band-1, band-2, band-3 (the row of photos near the end). Home: levels-*, life-*, cambridge-1 to 8, journey-1 to 5. Some pages have their own (see the staff guide).' } },
         { name: 'image', type: 'upload', relationTo: 'media', required: true },
