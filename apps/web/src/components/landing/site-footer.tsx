@@ -1,13 +1,15 @@
 import { localeDirection, locales, type Locale } from "@maarif/contracts/locales";
 import { messages } from "@/i18n/messages";
 import { pageNames } from "@/i18n/pages";
-import { builtAreas, menuPages, pathOf } from "@/lib/navigation";
+import { builtAreas, legalPages, menuPages, pathOf } from "@/lib/navigation";
 import { campuses, schoolEmail, telHref } from "@/lib/school";
 import { SocialLinks } from "@/components/site/social-links";
 import { LanguageTabs } from "./language-tabs";
 
+const cookieSettings: Record<Locale, string> = { en: "Cookie settings", fr: "Réglages des cookies", ar: "إعدادات ملفات تعريف الارتباط", tr: "Çerez ayarları" };
+
 // The closing sign: the school's name in all four scripts, every built page grouped by area,
-// both campuses' phones, the social accounts and the language tabs again.
+// both campuses' phones, the social accounts, the language tabs again and the legal pages.
 export function SiteFooter({ locale, path = "" }: { locale: Locale; path?: string }) {
   const t = messages[locale];
   const p = pageNames[locale];
@@ -81,9 +83,26 @@ export function SiteFooter({ locale, path = "" }: { locale: Locale; path?: strin
 
         <div className="flex flex-col gap-4 border-t border-white/12 pt-8 md:flex-row md:items-center md:justify-between">
           <LanguageTabs locale={locale} label={t.footer.languages} path={path} />
-          <p className="text-sm text-on-plate-muted">
-            © {new Date().getFullYear()} {t.schoolName}. {t.footer.rights}
-          </p>
+          <div className="flex flex-col gap-3 md:items-end">
+            <ul aria-label={p.areas.legal} className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+              {legalPages.map((key) => (
+                <li key={key}>
+                  <a href={`/${locale}${pathOf(key)}`} className="text-on-plate-muted no-underline hover:text-white hover:underline">
+                    {p.pages[key].title}
+                  </a>
+                </li>
+              ))}
+              {/* Shown by the cookie banner (components/site/consent.tsx) once analytics exists. */}
+              <li data-cookie-settings hidden>
+                <button type="button" className="cursor-pointer text-on-plate-muted hover:text-white hover:underline">
+                  {cookieSettings[locale]}
+                </button>
+              </li>
+            </ul>
+            <p className="text-sm text-on-plate-muted">
+              © {new Date().getFullYear()} {t.schoolName}. {t.footer.rights}
+            </p>
+          </div>
         </div>
       </div>
     </footer>

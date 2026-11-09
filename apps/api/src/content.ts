@@ -188,10 +188,10 @@ const text = (value: unknown) => (typeof value === "string" ? value.trim() : "")
 
 export async function readNews(env: Env, locale: Locale): Promise<NewsItem[]> {
   const q = new URLSearchParams({ locale, "fallback-locale": "none", limit: "3", depth: "1", sort: "-date" });
-  const result = await cmsGet<CmsList<{ id: string | number; kind?: string; title?: string; date?: string; summary?: string; image?: CmsUpload }>>(env, `/cms-api/news?${q}`);
+  const result = await cmsGet<CmsList<{ id: string | number; slug?: string; kind?: string; title?: string; date?: string; summary?: string; image?: CmsUpload }>>(env, `/cms-api/news?${q}`);
   return (result?.docs ?? []).flatMap((d) =>
     text(d.title) && text(d.summary) && d.date
-      ? [{ id: String(d.id), kind: d.kind === "event" ? "event" : "news", title: text(d.title), date: d.date.slice(0, 10), summary: text(d.summary), image: upload(d.image) } as NewsItem]
+      ? [{ id: String(d.id), slug: d.slug && /^[a-z0-9-]+$/.test(d.slug) ? d.slug : null, kind: d.kind === "event" ? "event" : "news", title: text(d.title), date: d.date.slice(0, 10), summary: text(d.summary), image: upload(d.image) } as NewsItem]
       : [],
   );
 }

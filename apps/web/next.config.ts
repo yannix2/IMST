@@ -2,19 +2,21 @@ import type { NextConfig } from "next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
 // Pages are statically generated, so a per-request nonce CSP is not possible (it would force
-// every page to render on demand). Instead: no third-party scripts except Turnstile, nothing
-// framed, nothing loaded from elsewhere. Inline scripts are Next.js's own hydration data.
+// every page to render on demand). Instead: no third-party scripts except Turnstile and, only
+// after the visitor accepts cookies, Google Analytics 4 (wave 3, ADR 010, components/site/
+// consent.tsx); nothing framed. Inline scripts are Next.js's own hydration data.
 const isDev = process.env.NODE_ENV === "development";
+const analytics = "https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com";
 
 const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline' ${
     isDev ? "'unsafe-eval' " : ""
-  }https://challenges.cloudflare.com`,
+  }https://challenges.cloudflare.com https://www.googletagmanager.com`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data:",
+  `img-src 'self' data: ${analytics}`,
   "font-src 'self'",
-  "connect-src 'self'",
+  `connect-src 'self' ${analytics}`,
   "media-src 'self'",
   "frame-src https://challenges.cloudflare.com",
   "frame-ancestors 'none'",

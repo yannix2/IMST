@@ -197,7 +197,7 @@ export function TestimonialsSection({ locale }: { locale: Locale }) {
 // ---- News and events ---------------------------------------------------------------------
 
 const newsPreview = (): NewsItem[] =>
-  [1, 2, 3].map((n) => ({ id: String(n), kind: n === 2 ? "event" : "news", title: `[News title ${n}]`, date: new Date().toISOString().slice(0, 10), summary: "[A short summary, published in maarifcms.]", image: null }));
+  [1, 2, 3].map((n) => ({ id: String(n), slug: null, kind: n === 2 ? "event" : "news", title: `[News title ${n}]`, date: new Date().toISOString().slice(0, 10), summary: "[A short summary, published in maarifcms.]", image: null }));
 
 export function NewsSection({ locale }: { locale: Locale }) {
   const t = messages[locale].news;
@@ -210,7 +210,7 @@ export function NewsSection({ locale }: { locale: Locale }) {
         <Heading id="news-title" title={t.title} lede={t.lede} />
         <ul className="mt-8 grid gap-5 md:grid-cols-3">
           {items.map((item) => (
-            <li key={item.id} className="flex flex-col overflow-hidden rounded-[var(--radius-plate)] bg-surface shadow-rest ring-1 ring-rule/60">
+            <li key={item.id} className="relative flex flex-col overflow-hidden rounded-[var(--radius-plate)] bg-surface shadow-rest ring-1 ring-rule/60 transition-shadow has-[a:hover]:shadow-rest-hover">
               {item.image ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={item.image.src} alt={item.image.alt} loading="lazy" decoding="async" className="aspect-[16/10] w-full object-cover" />
@@ -226,7 +226,16 @@ export function NewsSection({ locale }: { locale: Locale }) {
                     {formatDate(locale, item.date)}
                   </time>
                 </p>
-                <h3 className="text-xl font-bold text-heading">{item.title}</h3>
+                <h3 className="text-xl font-bold text-heading">
+                  {item.slug ? (
+                    // The whole card opens the article (wave 3); the link text stays the title.
+                    <a href={`/${locale}/campus-life/news/${item.slug}`} className="no-underline after:absolute after:inset-0 hover:underline focus-visible:outline-none focus-visible:after:rounded-[var(--radius-plate)] focus-visible:after:ring-3 focus-visible:after:ring-turquoise">
+                      {item.title}
+                    </a>
+                  ) : (
+                    item.title
+                  )}
+                </h3>
                 <p className="text-slate">{item.summary}</p>
               </div>
             </li>

@@ -299,3 +299,11 @@ export async function readSiteIndex(env: Env): Promise<SiteIndex> {
     redirects: (redirects?.docs ?? []).flatMap((r) => (r.from && r.to ? [{ from: r.from, to: r.to, permanent: r.permanent !== false }] : [])),
   };
 }
+
+// Public settings the site needs in the browser (wave 3, D5): only the Google Analytics 4
+// measurement ID staff enter in Site settings. Never contacts or recipients.
+export async function readSiteConfig(env: Env): Promise<{ gaMeasurementId: string | null }> {
+  const doc = await cmsGet<{ gaMeasurementId?: string | null }>(env, `/cms-api/globals/site-settings?depth=0`);
+  const id = text(doc?.gaMeasurementId).toUpperCase();
+  return { gaMeasurementId: /^G-[A-Z0-9]{4,12}$/.test(id) ? id : null };
+}

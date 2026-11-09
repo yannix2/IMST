@@ -7,7 +7,8 @@
 // For each photo in media-selection.json: the original is re-encoded at most 2400 px wide (JPEG,
 // no metadata), uploaded with its alt text in four languages, its consent status (non-identifiable
 // → "No identifiable child", adults → "Only adults can be recognised") and its focus point. Then
-// the Home page's photo slots (levels-*, life-*) and the Home film are filled. --publish also
+// the Home page's photo slots (levels-*, life-*) and the Home film are filled, then every inner
+// page's header and row of photos from page-photos.json (wave 3, approved 2026-11-09). --publish also
 // publishes them (the account must be a reviewer or administrator); otherwise they stay drafts.
 
 import { readFileSync, existsSync } from "node:fs";
@@ -67,9 +68,10 @@ async function upload({ source, buffer, filename, type, alt, consent, focus }) {
   return id;
 }
 
-// 1. Photos.
+// 1. Photos: the wave 2 set (media-selection.json) and the wave 3 page photos (page-photos.json).
+const pagePhotos = JSON.parse(readFileSync(join(here, "page-photos.json"), "utf8"));
 const ids = {};
-for (const photo of selection.photos) {
+for (const photo of [...selection.photos, ...pagePhotos.photos]) {
   const { buffer } = await upright(photo, root);
   const jpeg = await sharp(buffer).resize({ width: 2400, withoutEnlargement: true }).jpeg({ quality: 85, mozjpeg: true }).toBuffer();
   ids[photo.id] = await upload({
@@ -135,8 +137,25 @@ const slots = {
   "journey-4": "back-to-school",
   "journey-5": "model-oic",
 };
-const doc = { page: "home", slots: Object.entries(slots).map(([slot, id]) => ({ slot, image: ids[id] })), _status: publish ? "published" : "draft" };
-const found = (await api(`/page-visuals?${new URLSearchParams({ "where[page][equals]": "home", limit: "1", depth: "0", draft: "true" })}`)).docs?.[0];
-if (found) await api(`/page-visuals/${found.id}?draft=${!publish}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(doc) });
-else await api(`/page-visuals?draft=${!publish}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(doc) });
+const mediaOf = (id) => {
+  if (!ids[id]) throw new Error(`unknown photo id "${id}" (not in media-selection.json or page-photos.json)`);
+  return ids[id];
+};
+
+// One "Page photos" document per page (created, or replaced with this plan).
+async function savePageVisual(page, header, slotMap) {
+  const doc = { page, header: header ? mediaOf(header) : null, slots: Object.entries(slotMap).map(([slot, id]) => ({ slot, image: mediaOf(id) })), _status: publish ? "published" : "draft" };
+  const found = (await api(`/page-visuals?${new URLSearchParams({ "where[page][equals]": page, limit: "1", depth: "0", draft: "true" })}`)).docs?.[0];
+  if (found) await api(`/page-visuals/${found.id}?draft=${!publish}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(doc) });
+  else await api(`/page-visuals?draft=${!publish}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(doc) });
+}
+
+await savePageVisual("home", null, slots);
 console.log(`\nHome photos ${publish ? "published" : "saved as a draft"}: ${Object.keys(slots).length} slots, film ${publish ? "shown" : "not shown yet"}.`);
+
+// 4. Inner pages (wave 3): header photo and the row of photos band-1..3 (components/site/photo-band.tsx).
+for (const [page, plan] of Object.entries(pagePhotos.pages)) {
+  await savePageVisual(page, plan.header, Object.fromEntries((plan.band ?? []).map((id, i) => [`band-${i + 1}`, id])));
+  console.log(`page  ${page.padEnd(26)} → header ${plan.header}, ${plan.band?.length ?? 0} in the row`);
+}
+console.log(`Inner pages ${publish ? "published" : "saved as drafts"}: ${Object.keys(pagePhotos.pages).length}.`);

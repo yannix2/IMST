@@ -18,6 +18,7 @@ import {
   readNewsArticle,
   readNewsPage,
   readPageVisuals,
+  readSiteConfig,
   readSiteIndex,
   readTimetable,
   readTrips,
@@ -244,6 +245,8 @@ app.get(
   }),
 );
 app.get("/api/content/timetable", content((env, locale) => readTimetable(env, locale)));
+// No language: the same for every page. Cached briefly at the edge; staff changes show within minutes.
+app.get("/api/content/site-config", async (c) => c.json(await readSiteConfig(c.env), 200, { "cache-control": "public, max-age=300" }));
 app.get("/api/content/jobs", content((env, locale) => readJobs(env, locale)));
 app.get("/api/content/jobs/:slug", content((env, locale, c) => (slugOf(c) ? readJob(env, locale, slugOf(c)!) : Promise.resolve(null))));
 app.get("/api/content/pages/:slug", content((env, locale, c) => (slugOf(c) ? readCmsPage(env, locale, slugOf(c)!) : Promise.resolve(null))));

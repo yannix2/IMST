@@ -90,7 +90,7 @@ describe("GET /api/content/home", () => {
   it("returns every list, leaving out items without text in the language or without permission", async () => {
     const { env, fetch } = envWith((url) => {
       const path = new URL(url).pathname;
-      if (path === "/cms-api/news") return Response.json({ docs: [{ id: 1, kind: "event", title: "Science fair", date: "2026-11-20T00:00:00.000Z", summary: "Open to families.", image: 7 }, { id: 2, title: "", summary: "x", date: "2026-11-01" }] });
+      if (path === "/cms-api/news") return Response.json({ docs: [{ id: 1, slug: "science-fair", kind: "event", title: "Science fair", date: "2026-11-20T00:00:00.000Z", summary: "Open to families.", image: 7 }, { id: 2, title: "", summary: "x", date: "2026-11-01" }] });
       if (path === "/cms-api/faqs") return Response.json({ docs: [{ id: 3, question: "Hours?", answer: "8 to 4." }, { id: 4, question: "Bus?", answer: "" }] });
       if (path === "/cms-api/testimonials") return Response.json({ docs: [{ id: 5, kind: "parent", name: "A. B.", role: "Parent", quote: "Kind teachers." }] });
       if (path === "/cms-api/globals/gallery") return Response.json({ published: true, photos: [{ id: "p1", image: { filename: "yard.jpg", alt: "The yard" }, caption: "Break" }, { id: "p2", image: 9 }] });
@@ -99,7 +99,7 @@ describe("GET /api/content/home", () => {
     const response = await app.request("/api/content/home?locale=fr", {}, env);
     expect(response.status).toBe(200);
     const body = (await response.json()) as Record<string, unknown[]>;
-    expect(body.news).toEqual([{ id: "1", kind: "event", title: "Science fair", date: "2026-11-20", summary: "Open to families.", image: null }]);
+    expect(body.news).toEqual([{ id: "1", slug: "science-fair", kind: "event", title: "Science fair", date: "2026-11-20", summary: "Open to families.", image: null }]);
     expect(body.faqs).toEqual([{ id: "3", question: "Hours?", answer: "8 to 4." }]);
     expect(body.testimonials).toHaveLength(1);
     expect(body.gallery).toEqual([{ id: "p1", src: "/api/media/yard.jpg", alt: "The yard", caption: "Break" }]);

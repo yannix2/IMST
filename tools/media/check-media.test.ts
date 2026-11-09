@@ -1,11 +1,13 @@
 // Guards the photos the site ships (wave 2, task 1.5): every entry of the generated manifest
 // matches the contract (consent value, alt text in all four languages, ...), every file it names
 // exists, and the published media stay within the 25 MB budget.
-import { existsSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, test } from "vitest";
 import { photoSchema } from "@maarif/contracts/media";
+import { locales } from "@maarif/contracts/locales";
+import { isSitePageKey } from "@maarif/contracts/pages";
 import { heroPhotos, photos } from "../../apps/web/src/content/media";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -33,6 +35,29 @@ describe("site photos", () => {
 
   test("hero shots are photos of the manifest", () => {
     for (const id of heroPhotos) expect(photos[id]).toBeDefined();
+  });
+
+  // Wave 3 page photos (page-photos.json, uploaded to maarifcms by upload-to-cms.mjs).
+  test("the page photo plan names known photos and real pages", () => {
+    const read = (f: string) => JSON.parse(readFileSync(join(here, f), "utf8"));
+    const selection = read("media-selection.json") as { photos: { id: string }[] };
+    const plan = read("page-photos.json") as {
+      photos: { id: string; src: string; consent: string; focus: number[]; alt: Record<string, string> }[];
+      pages: Record<string, { header: string; band: string[] }>;
+    };
+    const known = new Set(selection.photos.map((p) => p.id));
+    for (const p of plan.photos) {
+      expect(known.has(p.id), `duplicate id ${p.id}`).toBe(false);
+      known.add(p.id);
+      expect(["non-identifiable", "adults", "authorized"]).toContain(p.consent);
+      for (const l of locales) expect(p.alt[l]?.trim().length, `${p.id} alt ${l}`).toBeGreaterThan(10);
+      expect(p.focus.every((v) => v >= 0 && v <= 1), `${p.id} focus`).toBe(true);
+    }
+    for (const [page, { header, band }] of Object.entries(plan.pages)) {
+      expect(isSitePageKey(page), page).toBe(true);
+      expect(band.length, page).toBeLessThanOrEqual(3);
+      for (const id of [header, ...band]) expect(known.has(id), `${page}: ${id}`).toBe(true);
+    }
   });
 
   test("published media stay within budget", () => {

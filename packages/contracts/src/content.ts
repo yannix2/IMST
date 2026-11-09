@@ -66,7 +66,8 @@ export function schoolWeek(now: Date): { weekOf: string; today: SchoolDay; dates
 
 // Home page sections that staff fill in maarifcms. Each list is empty until something is
 // published; the site then hides the section.
-export type NewsItem = { id: string; kind: "news" | "event"; title: string; date: string; summary: string; image: { src: string; alt: string } | null };
+// slug (wave 3): the article's address under /campus-life/news/; null for entries made before slugs.
+export type NewsItem = { id: string; slug: string | null; kind: "news" | "event"; title: string; date: string; summary: string; image: { src: string; alt: string } | null };
 export type FaqItem = { id: string; question: string; answer: string };
 export type Testimonial = { id: string; quote: string; name: string; role: string; kind: "parent" | "student" | "alumni" };
 export type GalleryImage = { id: string; src: string; alt: string; caption: string };

@@ -1,4 +1,5 @@
 import { locales, localeDirection, type Locale } from "@maarif/contracts/locales";
+import type { SitePhoto } from "@maarif/contracts/content";
 import { messages } from "@/i18n/messages";
 import { pageNames } from "@/i18n/pages";
 import type { PageKey } from "@/lib/navigation";
@@ -23,12 +24,16 @@ type Props = {
   lede?: string;
   figure?: { name: FigureName; label: string; captions?: Record<string, string> };
   children?: React.ReactNode; // actions under the lede
+  // Detail pages (a news article, an album, a job opening): their own title, and their own
+  // photo instead of the page's (null = no photo, keep the figure).
+  title?: string;
+  photo?: SitePhoto | null;
 };
 
-export async function PageHero({ locale, page, lede, figure, children }: Props) {
+export async function PageHero({ locale, page, lede, figure, children, title, photo }: Props) {
   const name = pageNames[locale].pages[page];
   const others = locales.filter((code) => code !== locale);
-  const header = (await getPageVisual(locale, page)).header;
+  const header = photo !== undefined ? photo : (await getPageVisual(locale, page)).header;
 
   return (
     <section aria-labelledby="page-title" className="mx-auto max-w-[var(--content-max)] px-[var(--gutter)] pt-4 pb-[calc(var(--section-pad)*0.3)] sm:pt-6">
@@ -47,7 +52,7 @@ export async function PageHero({ locale, page, lede, figure, children }: Props) 
             id="page-title"
             className="mt-3 text-[length:var(--text-display)] leading-[var(--leading-display)] font-bold text-balance text-heading"
           >
-            {name.title}
+            {title ?? name.title}
           </h1>
           <p className="mt-5 max-w-[56ch] text-lg text-slate sm:text-xl">{lede ?? name.blurb}</p>
           {children ? <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">{children}</div> : null}

@@ -95,6 +95,15 @@ describe("GET /api/content (wave 3 routes)", () => {
   });
 });
 
+describe("GET /api/content/site-config", () => {
+  it("gives only a well-formed Google Analytics ID, never other settings", async () => {
+    const good = envWith(() => Response.json({ gaMeasurementId: " g-ab12cd34ef ", notifications: { admissions: ["staff@school.tn"] } }));
+    expect(await (await app.request("/api/content/site-config", {}, good.env)).json()).toEqual({ gaMeasurementId: "G-AB12CD34EF" });
+    const bad = envWith(() => Response.json({ gaMeasurementId: "<script>" }));
+    expect(await (await app.request("/api/content/site-config", {}, bad.env)).json()).toEqual({ gaMeasurementId: null });
+  });
+});
+
 describe("POST /api/forms/feedback", () => {
   it("stores a parent's suggestion as an inquiry of kind feedback", async () => {
     const { env, fetch } = envWith(() => Response.json({ doc: { id: 9 } }, { status: 201 }));

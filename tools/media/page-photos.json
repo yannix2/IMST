@@ -1,0 +1,285 @@
+{
+  "$comment": "Wave 3 page photos (owner approval 2026-11-09, docs/plans/2026-11-09-wave-3-photos.md). Uploaded to maarifcms only (upload-to-cms.mjs), never built into the site. 'photos' adds to media-selection.json; 'pages' names each inner page's header and its row of photos (band-1..3) by photo id from either file. Consent: non-identifiable = no pupil can be recognised (or no people); adults = only adults can be recognised.",
+  "photos": [
+    {
+      "id": "school-entrance",
+      "src": "imstSM2526/Social Media 2025 - 2026/Back to school/6.jpg",
+      "consent": "non-identifiable",
+      "focus": [0.35, 0.45],
+      "alt": {
+        "en": "The school entrance on the first day back, with the school's name above the doors",
+        "fr": "L'entrée de l'école le jour de la rentrée, avec le nom de l'école au-dessus des portes",
+        "ar": "مدخل المدرسة في يوم العودة المدرسية، واسم المدرسة فوق الأبواب",
+        "tr": "Okulun ilk gününde, kapıların üzerinde okulun adıyla okul girişi"
+      }
+    },
+    {
+      "id": "courtyard-tents",
+      "src": "imstSM2526/Social Media 2025 - 2026/Back to school/1.jpg",
+      "consent": "non-identifiable",
+      "focus": [0.55, 0.6],
+      "alt": {
+        "en": "Pupils at tables under white tents in the school courtyard",
+        "fr": "Des élèves à des tables sous des tentes blanches dans la cour de l'école",
+        "ar": "تلاميذ حول طاولات تحت خيام بيضاء في ساحة المدرسة",
+        "tr": "Okul bahçesinde beyaz çadırların altında masalarda öğrenciler"
+      }
+    },
+    {
+      "id": "playground",
+      "src": "imstSM2526/Social Media 2025 - 2026/Back to school/5.jpg",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.6],
+      "alt": {
+        "en": "Pupils playing ball games in the sunny school playground",
+        "fr": "Des élèves jouent au ballon dans la cour ensoleillée de l'école",
+        "ar": "تلاميذ يلعبون بالكرة في ساحة المدرسة المشمسة",
+        "tr": "Güneşli okul bahçesinde top oynayan öğrenciler"
+      }
+    },
+    {
+      "id": "staff-group",
+      "src": "imstSM2526/Social Media 2025 - 2026/Parents meeting Term 1/20251025_075301224_iOS.heic",
+      "consent": "adults",
+      "focus": [0.5, 0.6],
+      "alt": {
+        "en": "The school's teachers and staff together under a mural that says Be kind",
+        "fr": "Les enseignants et le personnel de l'école réunis sous une fresque « Be kind »",
+        "ar": "معلمو المدرسة وموظفوها معًا تحت جدارية كُتب عليها Be kind",
+        "tr": "Okulun öğretmenleri ve personeli, Be kind yazan duvar resminin altında bir arada"
+      }
+    },
+    {
+      "id": "parent-teacher-meeting",
+      "src": "imstSM2526/Social Media 2025 - 2026/Parents meeting Term 1/20251025_101639581_iOS.heic",
+      "consent": "adults",
+      "focus": [0.5, 0.5],
+      "alt": {
+        "en": "A teacher and a parent talking at a desk during the parents' meeting",
+        "fr": "Une enseignante et une mère d'élève échangent à un bureau pendant la réunion des parents",
+        "ar": "معلمة وأمّ تتحدثان إلى مكتب خلال اجتماع أولياء الأمور",
+        "tr": "Veli toplantısında bir masada konuşan bir öğretmen ve bir veli"
+      }
+    },
+    {
+      "id": "parent-meeting-kg",
+      "src": "imstSM2526/Social Media 2025 - 2026/Parents meeting Term 1/20251025_103545261_iOS.heic",
+      "consent": "adults",
+      "focus": [0.5, 0.5],
+      "alt": {
+        "en": "A parent meets a kindergarten teacher in a classroom with a painted world map",
+        "fr": "Une mère rencontre une enseignante de maternelle dans une classe ornée d'une carte du monde",
+        "ar": "أمّ تلتقي معلمة الروضة في قسم مزيّن بخريطة للعالم",
+        "tr": "Bir veli, duvarında dünya haritası olan bir sınıfta anaokulu öğretmeniyle görüşüyor"
+      }
+    },
+    {
+      "id": "teachers-day-gifts",
+      "src": "imstSM2526/Social Media 2025 - 2026/Teachers Day/IMG_8905.JPG",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.5],
+      "alt": {
+        "en": "Gift baskets with heart cards prepared for Teachers' Day",
+        "fr": "Des paniers cadeaux avec des cartes en forme de cœur préparés pour la Journée des enseignants",
+        "ar": "سلال هدايا مع بطاقات على شكل قلب أُعدّت ليوم المعلم",
+        "tr": "Öğretmenler Günü için hazırlanmış kalp kartlı hediye sepetleri"
+      }
+    },
+    {
+      "id": "teachers-day-teachers",
+      "src": "imstSM2526/Social Media 2025 - 2026/Teachers Day/IMG_8909.JPG",
+      "consent": "adults",
+      "focus": [0.5, 0.45],
+      "alt": {
+        "en": "Teachers smiling together with their Teachers' Day gifts",
+        "fr": "Des enseignantes sourient ensemble avec leurs cadeaux de la Journée des enseignants",
+        "ar": "معلمات يبتسمن معًا مع هدايا يوم المعلم",
+        "tr": "Öğretmenler Günü hediyeleriyle birlikte gülümseyen öğretmenler"
+      }
+    },
+    {
+      "id": "kg-farm-behind",
+      "src": "imstSM2526/Social Media 2025 - 2026/Farm Animals/IMG_9709.JPG",
+      "consent": "non-identifiable",
+      "focus": [0.4, 0.55],
+      "alt": {
+        "en": "A kindergarten child, seen from behind, at the cardboard cow of the farm corner",
+        "fr": "Un enfant de maternelle, vu de dos, devant la vache en carton du coin ferme",
+        "ar": "طفل من الروضة، من الخلف، أمام البقرة الكرتونية في ركن المزرعة",
+        "tr": "Çiftlik köşesindeki karton ineğin yanında, arkadan görünen bir anaokulu çocuğu"
+      }
+    },
+    {
+      "id": "graduation-hall",
+      "src": "imstSM2526/Social Media 2025 - 2026/Year 13 Graduation/Selection/48.JPG",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.45],
+      "alt": {
+        "en": "The graduation hall seen from the back, families facing the stage",
+        "fr": "La salle de la remise des diplômes vue du fond, les familles face à la scène",
+        "ar": "قاعة حفل التخرج من الخلف، والعائلات في مواجهة المنصة",
+        "tr": "Arkadan görünen mezuniyet salonu, sahneye dönük aileler"
+      }
+    },
+    {
+      "id": "graduation-guests",
+      "src": "imstSM2526/Social Media 2025 - 2026/Year 13 Graduation/Selection/32.JPG",
+      "consent": "adults",
+      "focus": [0.5, 0.5],
+      "alt": {
+        "en": "Guests in the front rows at the Year 13 graduation",
+        "fr": "Les invités au premier rang de la remise des diplômes de l'année 13",
+        "ar": "الضيوف في الصفوف الأمامية خلال حفل تخرج سنة 13",
+        "tr": "Yıl 13 mezuniyet töreninde ön sıralardaki konuklar"
+      }
+    },
+    {
+      "id": "university-speaker",
+      "src": "imstSM2526/Social Media 2025 - 2026/University Visit/IMG_9266.JPG",
+      "consent": "adults",
+      "focus": [0.4, 0.5],
+      "alt": {
+        "en": "A university guest speaks at the lectern beside a presentation screen",
+        "fr": "Une invitée universitaire parle au pupitre à côté d'un écran de présentation",
+        "ar": "ضيفة من الجامعة تتحدث من المنصة بجانب شاشة العرض",
+        "tr": "Bir üniversite konuğu, sunum ekranının yanında kürsüde konuşuyor"
+      }
+    },
+    {
+      "id": "kindness-week-screen",
+      "src": "imstSM2526/Social Media 2025 - 2026/Kindness Week Charguia 2/IMG_9897.JPG",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.6],
+      "alt": {
+        "en": "Pupils, seen from behind, watching a quiz on the big screen during Kindness Week",
+        "fr": "Des élèves, vus de dos, suivent un quiz sur grand écran pendant la Semaine de la gentillesse",
+        "ar": "تلاميذ، من الخلف، يتابعون مسابقة على الشاشة الكبيرة خلال أسبوع اللطف",
+        "tr": "Nezaket Haftası'nda büyük ekrandaki yarışmayı izleyen, arkadan görünen öğrenciler"
+      }
+    },
+    {
+      "id": "kindness-week-jury",
+      "src": "imstSM2526/Social Media 2025 - 2026/Kindness Week Charguia 2/IMG_9884.JPG",
+      "consent": "adults",
+      "focus": [0.5, 0.5],
+      "alt": {
+        "en": "Two members of staff at the jury table during Kindness Week",
+        "fr": "Deux membres du personnel à la table du jury pendant la Semaine de la gentillesse",
+        "ar": "موظفان على طاولة لجنة التحكيم خلال أسبوع اللطف",
+        "tr": "Nezaket Haftası'nda jüri masasındaki iki personel"
+      }
+    },
+    {
+      "id": "traditional-day-line",
+      "src": "imstSM2526/Social Media 2025 - 2026/Traditional Day 2026/16.JPG",
+      "consent": "adults",
+      "focus": [0.5, 0.6],
+      "alt": {
+        "en": "Guests standing in line before the flags at Traditional Day",
+        "fr": "Les invités alignés devant les drapeaux lors de la Journée traditionnelle",
+        "ar": "الضيوف يقفون في صف أمام الأعلام خلال اليوم التقليدي",
+        "tr": "Geleneksel Gün'de bayrakların önünde sıra halinde duran konuklar"
+      }
+    },
+    {
+      "id": "traditional-day-baklava",
+      "src": "imstSM2526/Social Media 2025 - 2026/Traditional Day 2026/41.JPG",
+      "consent": "adults",
+      "focus": [0.45, 0.55],
+      "alt": {
+        "en": "Baklava offered to guests under the tent at Traditional Day",
+        "fr": "Des baklavas offerts aux invités sous la tente lors de la Journée traditionnelle",
+        "ar": "تقديم البقلاوة للضيوف تحت الخيمة خلال اليوم التقليدي",
+        "tr": "Geleneksel Gün'de çadırın altında konuklara ikram edilen baklava"
+      }
+    },
+    {
+      "id": "ethnosports-banner",
+      "src": "imstSM2526/Social Media 2025 - 2026/ARCHERY/IMG_8563.JPG",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.45],
+      "alt": {
+        "en": "An Ethnosports banner on the goal of the school sports hall",
+        "fr": "Une banderole « L'Ethnosports » sur le but de la salle de sport de l'école",
+        "ar": "لافتة L'Ethnosports على مرمى القاعة الرياضية للمدرسة",
+        "tr": "Okul spor salonundaki kalenin üzerinde bir Ethnosports pankartı"
+      }
+    },
+    {
+      "id": "sports-hall",
+      "src": "imstSM2526/Social Media 2025 - 2026/ARCHERY/IMG_8644.JPG",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.55],
+      "alt": {
+        "en": "The school sports hall set up for archery, with targets at the far end",
+        "fr": "La salle de sport de l'école préparée pour le tir à l'arc, les cibles au fond",
+        "ar": "القاعة الرياضية للمدرسة مجهّزة للرماية بالقوس، والأهداف في آخرها",
+        "tr": "Okçuluk için hazırlanmış okul spor salonu, hedefler en uçta"
+      }
+    },
+    {
+      "id": "maarif-talks-author",
+      "src": "imstSM2526/Social Media 2025 - 2026/Maarif Talks/20260508_094817669_iOS.heic",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.45],
+      "alt": {
+        "en": "A pupil gives a talk called Author on the Maarif Talks stage",
+        "fr": "Une élève présente un exposé intitulé « Author » sur la scène des Maarif Talks",
+        "ar": "تلميذة تقدّم مداخلة بعنوان Author على منصة Maarif Talks",
+        "tr": "Bir öğrenci Maarif Talks sahnesinde Author başlıklı bir konuşma yapıyor"
+      }
+    },
+    {
+      "id": "maarif-talks-friends",
+      "src": "imstSM2526/Social Media 2025 - 2026/Maarif Talks/20260508_102954976_iOS.heic",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.45],
+      "alt": {
+        "en": "A talk about friendship on the Maarif Talks stage, the word Friends on the screen",
+        "fr": "Un exposé sur l'amitié aux Maarif Talks, le mot « Friends » à l'écran",
+        "ar": "مداخلة عن الصداقة على منصة Maarif Talks وكلمة Friends على الشاشة",
+        "tr": "Maarif Talks sahnesinde arkadaşlık üzerine bir konuşma, ekranda Friends yazısı"
+      }
+    },
+    {
+      "id": "country-representative",
+      "src": "imstSM2526/Social Media 2025 - 2026/Year 13 Graduation/Selection/22.JPG",
+      "consent": "adults",
+      "focus": [0.35, 0.45],
+      "alt": {
+        "en": "The Türkiye Maarif Foundation's country representative speaking at the graduation",
+        "fr": "Le représentant pays de la Fondation Maarif de Türkiye prend la parole à la remise des diplômes",
+        "ar": "الممثل القُطري لوقف المعارف التركي يلقي كلمة في حفل التخرج",
+        "tr": "Türkiye Maarif Vakfı ülke temsilcisi mezuniyet töreninde konuşuyor"
+      }
+    }
+  ],
+  "pages": {
+    "about": { "header": "courtyard-tents", "band": ["back-to-school", "traditional-day-line", "kind-words-paper"] },
+    "about/mission-vision": { "header": "tracing-hands", "band": ["kindness-week-screen", "kind-words-outline", "teachers-day-gifts"] },
+    "about/welcome": { "header": "school-entrance", "band": ["staff-group", "graduation-guests", "end-of-year-stage"] },
+    "about/leadership": { "header": "staff-group", "band": ["teachers-day-teachers", "kindness-week-jury", "teachers-day-staff"] },
+    "about/accreditations": { "header": "graduation-plaque", "band": ["graduation-hall", "university-visit", "country-representative"] },
+    "about/child-protection": { "header": "kindergarten-classroom", "band": ["teeth-brushing-hands", "kindness-week-screen", "kindness-week-jury"] },
+    "programs": { "header": "playground", "band": ["microscope-hands", "kg-farm-behind", "maarif-talks-author"] },
+    "programs/kindergarten": { "header": "kindergarten-farm-corner", "band": ["kg-farm-behind", "teeth-brushing-hands", "pink-day-class"] },
+    "programs/primary": { "header": "primary-microscope", "band": ["courtyard-tents", "kind-words-outline", "back-to-school"] },
+    "programs/lower-secondary": { "header": "secondary-archery", "band": ["kindness-week-screen", "sports-hall", "model-oic"] },
+    "programs/upper-secondary": { "header": "graduation-hall", "band": ["university-speaker", "maarif-talks-friends", "maarif-talks"] },
+    "programs/cambridge": { "header": "microscope-from-above", "band": ["graduation-plaque", "university-visit", "maarif-talks-author"] },
+    "programs/languages": { "header": "ebru-hands", "band": ["traditional-day-ebru", "traditional-day-baklava", "traditional-day-guests"] },
+    "programs/student-support": { "header": "kind-words-paper", "band": ["kindness-week-jury", "parent-teacher-meeting", "teeth-brushing-hands"] },
+    "programs/technology": { "header": "microscope-hands", "band": [] },
+    "admissions": { "header": "school-entrance", "band": ["parent-meeting-kg", "parent-teacher-meeting", "back-to-school"] },
+    "admissions/ages": { "header": "pink-day-class", "band": [] },
+    "admissions/visit": { "header": "courtyard-tents", "band": ["playground", "archery-hall", "kindergarten-classroom"] },
+    "admissions/pre-register": { "header": "parent-meeting-kg", "band": [] },
+    "admissions/faq": { "header": "parent-teacher-meeting", "band": [] },
+    "contact": { "header": "school-entrance", "band": [] },
+    "campus-life": { "header": "traditional-day-line", "band": ["traditional-day-baklava", "ebru-hands", "farm-pond"] },
+    "parents": { "header": "parent-teacher-meeting", "band": ["parent-meeting-kg", "staff-group"] },
+    "careers": { "header": "teachers-day-teachers", "band": ["staff-group", "teachers-day-gifts", "kindness-week-jury"] },
+    "campus-life/clubs": { "header": "ethnosports-banner", "band": ["archery-targets", "sports-hall", "maarif-talks"] },
+    "campus-life/trips": { "header": "farm-pond", "band": ["kg-farm-behind"] }
+  }
+}

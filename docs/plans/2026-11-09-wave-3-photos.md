@@ -1,6 +1,6 @@
 # Wave 3 photo proposal (C3, owner checkpoint)
 
-> **Status:** waiting for the owner's approval (2026-11-09). Nothing below is uploaded yet.
+> **Status:** approved by the owner (2026-11-09). The plan is in `tools/media/page-photos.json` (ids instead of N-numbers) and goes into maarifcms with `upload-to-cms.mjs`.
 > Media inbox on 2026-11-09: no new files since the last review (1,632 files).
 > Board of the new candidates: `wave3-board.jpg` in the session scratchpad (full path given in the report).
 > Rule kept: pupils only in shots where no face can be recognised; adults may be recognisable.
@@ -15,8 +15,8 @@
 | N4 | Whole staff, group photo under "Be kind" (`Parents meeting Term 1/20251025_075301224_iOS`) | adults | Every staff member recognisable: check nobody objects |
 | N5 | Parent-teacher meeting (`…_101639581_iOS`) | adults | Parent recognisable: needs that parent's OK `[to confirm]` |
 | N6 | Parent meeting in a KG room (`…_103545261_iOS`) | adults | Same as N5 |
-| N7 | Teachers' Day gift baskets, no people (`Teachers Day/20251006_142329300_iOS`) | none | |
-| N8 | Teachers on Teachers' Day (`…_145544380_iOS`) | adults | |
+| N7 | Teachers' Day gift baskets, no people (`Teachers Day/IMG_8905.JPG`) | none | |
+| N8 | Teachers on Teachers' Day (`Teachers Day/IMG_8909.JPG`) | adults | |
 | N9 | KG farm corner, child from behind (`Farm Animals/IMG_9709.JPG`) | non-identifiable | |
 | N11 | Graduation hall seen from the back (`Year 13 Graduation/Selection/48.JPG`) | non-identifiable | |
 | N12 | Guests at graduation (`…/Selection/32.JPG`) | adults | |
