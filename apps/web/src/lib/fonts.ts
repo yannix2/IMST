@@ -21,10 +21,13 @@ export const figtree = Figtree({
 });
 
 // Arabic letters only: digits are Western (0 to 9) and come from Figtree.
+// display "optional" (wave 3, F2): the metric fallback does not match Arabic letters, so a late
+// swap moved Arabic headings (CLS 0.0036 on /ar pages). The file is preloaded and usually arrives
+// within the browser's short wait; if not, that one visit keeps the fallback and nothing moves.
 export const readexPro = Readex_Pro({
   subsets: ["arabic"],
   weight: ["400", "500", "700"],
-  display: "swap",
+  display: "optional",
   variable: "--font-readex",
 });
 
