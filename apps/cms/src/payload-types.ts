@@ -71,13 +71,23 @@ export interface Config {
     users: User;
     'api-clients': ApiClient;
     pages: Page;
+    'page-visuals': PageVisual;
     media: Media;
     inquiries: Inquiry;
     'weekly-menus': WeeklyMenu;
     news: News;
+    albums: Album;
+    clubs: Club;
+    trips: Trip;
     faqs: Faq;
     testimonials: Testimonial;
     people: Person;
+    documents: Document;
+    jobs: Job;
+    applications: Application;
+    'private-files': PrivateFile;
+    redirects: Redirect;
+    'audit-log': AuditLog;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,13 +98,23 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     'api-clients': ApiClientsSelect<false> | ApiClientsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
+    'page-visuals': PageVisualsSelect<false> | PageVisualsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     inquiries: InquiriesSelect<false> | InquiriesSelect<true>;
     'weekly-menus': WeeklyMenusSelect<false> | WeeklyMenusSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
+    albums: AlbumsSelect<false> | AlbumsSelect<true>;
+    clubs: ClubsSelect<false> | ClubsSelect<true>;
+    trips: TripsSelect<false> | TripsSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     people: PeopleSelect<false> | PeopleSelect<true>;
+    documents: DocumentsSelect<false> | DocumentsSelect<true>;
+    jobs: JobsSelect<false> | JobsSelect<true>;
+    applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
+    'private-files': PrivateFilesSelect<false> | PrivateFilesSelect<true>;
+    redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -107,13 +127,19 @@ export interface Config {
     ('false' | 'none' | 'null') | false | null | ('en' | 'fr' | 'ar' | 'tr') | ('en' | 'fr' | 'ar' | 'tr')[];
   globals: {
     'head-message': HeadMessage;
+    'home-hero': HomeHero;
     gallery: Gallery;
     'school-facts': SchoolFact;
+    timetables: Timetable;
+    'site-settings': SiteSetting;
   };
   globalsSelect: {
     'head-message': HeadMessageSelect<false> | HeadMessageSelect<true>;
+    'home-hero': HomeHeroSelect<false> | HomeHeroSelect<true>;
     gallery: GallerySelect<false> | GallerySelect<true>;
     'school-facts': SchoolFactsSelect<false> | SchoolFactsSelect<true>;
+    timetables: TimetablesSelect<false> | TimetablesSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: 'en' | 'fr' | 'ar' | 'tr';
   widgets: {
@@ -238,13 +264,26 @@ export interface Page {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * A photo appears on the site only after a reviewer sets its consent status.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
   id: number;
   alt: string;
-  consent: 'pending' | 'no-identifiable-child' | 'parental-authorization';
+  consent: 'pending' | 'no-identifiable-child' | 'adults-only' | 'parental-authorization';
+  /**
+   * Where the subject is, in % from the left and from the top (50/50 = centre).
+   */
+  focus?: {
+    x?: number | null;
+    y?: number | null;
+  };
+  /**
+   * Where the original is (IMSTMEDIA folder or event), for the record.
+   */
+  source?: string | null;
   _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -257,12 +296,80 @@ export interface Media {
   height?: number | null;
 }
 /**
+ * Choose the photos each page shows. A page without a published entry keeps its drawing.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page-visuals".
+ */
+export interface PageVisual {
+  id: number;
+  page:
+    | 'home'
+    | 'about'
+    | 'about/mission-vision'
+    | 'about/welcome'
+    | 'about/leadership'
+    | 'about/accreditations'
+    | 'about/child-protection'
+    | 'programs'
+    | 'programs/kindergarten'
+    | 'programs/primary'
+    | 'programs/lower-secondary'
+    | 'programs/upper-secondary'
+    | 'programs/cambridge'
+    | 'programs/languages'
+    | 'programs/student-support'
+    | 'programs/technology'
+    | 'admissions'
+    | 'admissions/ages'
+    | 'admissions/visit'
+    | 'admissions/pre-register'
+    | 'admissions/faq'
+    | 'admissions/bus-canteen'
+    | 'admissions/fees'
+    | 'campus-life'
+    | 'campus-life/news'
+    | 'campus-life/events'
+    | 'campus-life/gallery'
+    | 'campus-life/clubs'
+    | 'campus-life/trips'
+    | 'parents'
+    | 'parents/calendar'
+    | 'parents/schedules'
+    | 'parents/menu'
+    | 'parents/handbook'
+    | 'parents/feedback'
+    | 'careers'
+    | 'careers/openings'
+    | 'contact'
+    | 'privacy'
+    | 'cookies'
+    | 'terms';
+  /**
+   * Children only in shots where nobody can recognise them, unless written parental authorization is on file (the photo’s consent status says which).
+   */
+  header?: (number | null) | Media;
+  slots?:
+    | {
+        /**
+         * Place name used by the page. Every inner page: band-1, band-2, band-3 (the row of photos near the end). Home: levels-*, life-*, cambridge-1 to 8, journey-1 to 5. Some pages have their own (see the staff guide).
+         */
+        slot: string;
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "inquiries".
  */
 export interface Inquiry {
   id: number;
-  kind: 'pre-registration' | 'visit-booking' | 'contact';
+  kind: 'pre-registration' | 'visit-booking' | 'contact' | 'feedback';
   locale: 'en' | 'fr' | 'ar' | 'tr';
   status: 'new' | 'contacted' | 'closed';
   contactName: string;
@@ -338,14 +445,203 @@ export interface News {
   kind: 'news' | 'event';
   title: string;
   /**
+   * Web address. Latin letters, digits and hyphens; filled from the English title if empty.
+   */
+  slug: string;
+  /**
    * For an event: the day it happens. For news: the day it happened.
    */
   date: string;
+  stages?: ('kindergarten' | 'primary' | 'lower-secondary' | 'upper-secondary')[] | null;
   summary: string;
   /**
-   * Children only with written parental authorization (consent status cleared).
+   * The full story on the news page.
+   */
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Children only in shots where nobody can recognise them, unless written parental authorization is on file (the photo’s consent status says which).
    */
   image?: (number | null) | Media;
+  /**
+   * Children only in shots where nobody can recognise them, unless written parental authorization is on file (the photo’s consent status says which).
+   */
+  photos?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Only for events.
+   */
+  event?: {
+    startsAt?: string | null;
+    endsAt?: string | null;
+    place?: string | null;
+    /**
+     * How families sign up, if they need to.
+     */
+    registration?: string | null;
+  };
+  /**
+   * A language is shown on the site only when Ready or Proofread.
+   */
+  translationStatus: 'draft' | 'ready' | 'proofread';
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "albums".
+ */
+export interface Album {
+  id: number;
+  title: string;
+  /**
+   * Web address. Latin letters, digits and hyphens; filled from the English title if empty.
+   */
+  slug: string;
+  date: string;
+  stages?: ('kindergarten' | 'primary' | 'lower-secondary' | 'upper-secondary')[] | null;
+  summary?: string | null;
+  cover: number | Media;
+  /**
+   * Children only in shots where nobody can recognise them, unless written parental authorization is on file (the photo’s consent status says which).
+   */
+  photos?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional short video (MP4, at most 10 MB).
+   */
+  video?: (number | null) | Media;
+  /**
+   * A language is shown on the site only when Ready or Proofread.
+   */
+  translationStatus: 'draft' | 'ready' | 'proofread';
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "clubs".
+ */
+export interface Club {
+  id: number;
+  name: string;
+  /**
+   * Web address. Latin letters, digits and hyphens; filled from the English title if empty.
+   */
+  slug: string;
+  stages?: ('kindergarten' | 'primary' | 'lower-secondary' | 'upper-secondary')[] | null;
+  campus?: ('schools' | 'highSchool') | null;
+  summary: string;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * For example: Wednesdays 14:00 to 15:30.
+   */
+  schedule?: string | null;
+  /**
+   * Organisation that runs the club with the school, if any.
+   */
+  partner?: string | null;
+  photo?: (number | null) | Media;
+  /**
+   * Children only in shots where nobody can recognise them, unless written parental authorization is on file (the photo’s consent status says which).
+   */
+  photos?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  order?: number | null;
+  /**
+   * A language is shown on the site only when Ready or Proofread.
+   */
+  translationStatus: 'draft' | 'ready' | 'proofread';
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "trips".
+ */
+export interface Trip {
+  id: number;
+  destination: string;
+  /**
+   * Web address. Latin letters, digits and hyphens; filled from the English title if empty.
+   */
+  slug: string;
+  /**
+   * Town or region, for example Zaghouan.
+   */
+  place?: string | null;
+  stages?: ('kindergarten' | 'primary' | 'lower-secondary' | 'upper-secondary')[] | null;
+  summary: string;
+  lastVisit?: string | null;
+  photo?: (number | null) | Media;
+  /**
+   * Children only in shots where nobody can recognise them, unless written parental authorization is on file (the photo’s consent status says which).
+   */
+  photos?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  order?: number | null;
+  /**
+   * A language is shown on the site only when Ready or Proofread.
+   */
+  translationStatus: 'draft' | 'ready' | 'proofread';
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -411,6 +707,164 @@ export interface Person {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documents".
+ */
+export interface Document {
+  id: number;
+  title: string;
+  kind: 'calendar' | 'handbook' | 'form' | 'policy' | 'other';
+  /**
+   * For example 2026-2027.
+   */
+  schoolYear?: string | null;
+  stages?: ('kindergarten' | 'primary' | 'lower-secondary' | 'upper-secondary')[] | null;
+  summary?: string | null;
+  /**
+   * PDF, one per language when the school has it in that language.
+   */
+  file: number | Media;
+  validFrom?: string | null;
+  validUntil?: string | null;
+  /**
+   * A language is shown on the site only when Ready or Proofread.
+   */
+  translationStatus: 'draft' | 'ready' | 'proofread';
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobs".
+ */
+export interface Job {
+  id: number;
+  title: string;
+  /**
+   * Web address. Latin letters, digits and hyphens; filled from the English title if empty.
+   */
+  slug: string;
+  campus?: ('schools' | 'highSchool') | null;
+  contract?: ('full-time' | 'part-time' | 'fixed-term') | null;
+  startsOn?: string | null;
+  /**
+   * Last day to apply; the opening disappears after it.
+   */
+  closesOn?: string | null;
+  summary: string;
+  /**
+   * Role, requirements, what the school offers.
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * A language is shown on the site only when Ready or Proofread.
+   */
+  translationStatus: 'draft' | 'ready' | 'proofread';
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "applications".
+ */
+export interface Application {
+  id: number;
+  /**
+   * Empty for a spontaneous application.
+   */
+  job?: (number | null) | Job;
+  position: string;
+  name: string;
+  email: string;
+  phone?: string | null;
+  message?: string | null;
+  cv: number | PrivateFile;
+  locale: 'en' | 'fr' | 'ar' | 'tr';
+  status: 'new' | 'reviewing' | 'interview' | 'declined' | 'hired';
+  privacyNoticeAcceptedAt: string;
+  /**
+   * Internal notes. Never shared with the candidate.
+   */
+  staffNotes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "private-files".
+ */
+export interface PrivateFile {
+  id: number;
+  label?: string | null;
+  prefix?: string | null;
+  _objectKey?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects".
+ */
+export interface Redirect {
+  id: number;
+  from: string;
+  to: string;
+  /**
+   * Permanent (301) tells search engines the page moved for good.
+   */
+  permanent?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log".
+ */
+export interface AuditLog {
+  id: number;
+  user?: (number | null) | User;
+  /**
+   * Who did it when it was not a staff account (for example the website gateway).
+   */
+  actor?: string | null;
+  action: 'create' | 'update' | 'publish' | 'unpublish' | 'delete';
+  /**
+   * Collection or global.
+   */
+  target: string;
+  targetId?: string | null;
+  summary?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -446,6 +900,10 @@ export interface PayloadLockedDocument {
         value: number | Page;
       } | null)
     | ({
+        relationTo: 'page-visuals';
+        value: number | PageVisual;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -462,6 +920,18 @@ export interface PayloadLockedDocument {
         value: number | News;
       } | null)
     | ({
+        relationTo: 'albums';
+        value: number | Album;
+      } | null)
+    | ({
+        relationTo: 'clubs';
+        value: number | Club;
+      } | null)
+    | ({
+        relationTo: 'trips';
+        value: number | Trip;
+      } | null)
+    | ({
         relationTo: 'faqs';
         value: number | Faq;
       } | null)
@@ -472,6 +942,30 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'people';
         value: number | Person;
+      } | null)
+    | ({
+        relationTo: 'documents';
+        value: number | Document;
+      } | null)
+    | ({
+        relationTo: 'jobs';
+        value: number | Job;
+      } | null)
+    | ({
+        relationTo: 'applications';
+        value: number | Application;
+      } | null)
+    | ({
+        relationTo: 'private-files';
+        value: number | PrivateFile;
+      } | null)
+    | ({
+        relationTo: 'redirects';
+        value: number | Redirect;
+      } | null)
+    | ({
+        relationTo: 'audit-log';
+        value: number | AuditLog;
       } | null);
   globalSlug?: string | null;
   user:
@@ -585,11 +1079,36 @@ export interface PagesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "page-visuals_select".
+ */
+export interface PageVisualsSelect<T extends boolean = true> {
+  page?: T;
+  header?: T;
+  slots?:
+    | T
+    | {
+        slot?: T;
+        image?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   consent?: T;
+  focus?:
+    | T
+    | {
+        x?: T;
+        y?: T;
+      };
+  source?: T;
   _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -649,9 +1168,116 @@ export interface WeeklyMenusSelect<T extends boolean = true> {
 export interface NewsSelect<T extends boolean = true> {
   kind?: T;
   title?: T;
+  slug?: T;
   date?: T;
+  stages?: T;
   summary?: T;
+  body?: T;
   image?: T;
+  photos?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  event?:
+    | T
+    | {
+        startsAt?: T;
+        endsAt?: T;
+        place?: T;
+        registration?: T;
+      };
+  translationStatus?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "albums_select".
+ */
+export interface AlbumsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  date?: T;
+  stages?: T;
+  summary?: T;
+  cover?: T;
+  photos?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  video?: T;
+  translationStatus?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "clubs_select".
+ */
+export interface ClubsSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  stages?: T;
+  campus?: T;
+  summary?: T;
+  description?: T;
+  schedule?: T;
+  partner?: T;
+  photo?: T;
+  photos?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  order?: T;
+  translationStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "trips_select".
+ */
+export interface TripsSelect<T extends boolean = true> {
+  destination?: T;
+  slug?: T;
+  place?: T;
+  stages?: T;
+  summary?: T;
+  lastVisit?: T;
+  photo?: T;
+  photos?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  order?: T;
+  translationStatus?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -696,6 +1322,110 @@ export interface PeopleSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documents_select".
+ */
+export interface DocumentsSelect<T extends boolean = true> {
+  title?: T;
+  kind?: T;
+  schoolYear?: T;
+  stages?: T;
+  summary?: T;
+  file?: T;
+  validFrom?: T;
+  validUntil?: T;
+  translationStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "jobs_select".
+ */
+export interface JobsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  campus?: T;
+  contract?: T;
+  startsOn?: T;
+  closesOn?: T;
+  summary?: T;
+  description?: T;
+  translationStatus?: T;
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "applications_select".
+ */
+export interface ApplicationsSelect<T extends boolean = true> {
+  job?: T;
+  position?: T;
+  name?: T;
+  email?: T;
+  phone?: T;
+  message?: T;
+  cv?: T;
+  locale?: T;
+  status?: T;
+  privacyNoticeAcceptedAt?: T;
+  staffNotes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "private-files_select".
+ */
+export interface PrivateFilesSelect<T extends boolean = true> {
+  label?: T;
+  prefix?: T;
+  _objectKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "redirects_select".
+ */
+export interface RedirectsSelect<T extends boolean = true> {
+  from?: T;
+  to?: T;
+  permanent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log_select".
+ */
+export interface AuditLogSelect<T extends boolean = true> {
+  user?: T;
+  actor?: T;
+  action?: T;
+  target?: T;
+  targetId?: T;
+  summary?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -767,6 +1497,20 @@ export interface HeadMessage {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home-hero".
+ */
+export interface HomeHero {
+  id: number;
+  published?: boolean | null;
+  filmLandscape?: (number | null) | Media;
+  filmPortrait?: (number | null) | Media;
+  posterLandscape?: (number | null) | Media;
+  posterPortrait?: (number | null) | Media;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "gallery".
  */
 export interface Gallery {
@@ -799,6 +1543,85 @@ export interface SchoolFact {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "timetables".
+ */
+export interface Timetable {
+  id: number;
+  published?: boolean | null;
+  /**
+   * For example 2026-2027.
+   */
+  schoolYear?: string | null;
+  rows?:
+    | {
+        stage: 'kindergarten' | 'primary' | 'lower-secondary' | 'upper-secondary';
+        campus?: ('schools' | 'highSchool') | null;
+        /**
+         * For example: Monday to Friday.
+         */
+        days: string;
+        start: string;
+        end: string;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  /**
+   * Each address must first be verified in Cloudflare Email Routing, or the email is not sent.
+   */
+  notifications?: {
+    admissions?:
+      | {
+          email: string;
+          id?: string | null;
+        }[]
+      | null;
+    general?:
+      | {
+          email: string;
+          id?: string | null;
+        }[]
+      | null;
+    parents?:
+      | {
+          email: string;
+          id?: string | null;
+        }[]
+      | null;
+    careers?:
+      | {
+          email: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * For example: Monday to Friday, 8:00 to 16:00.
+   */
+  officeHours?: string | null;
+  gaMeasurementId?: string | null;
+  /**
+   * How long personal data is kept before automatic deletion (to confirm with the lawyer).
+   */
+  retention?: {
+    inquiriesMonths?: number | null;
+    applicationsMonths?: number | null;
+    auditLogMonths?: number | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "head-message_select".
  */
 export interface HeadMessageSelect<T extends boolean = true> {
@@ -809,6 +1632,20 @@ export interface HeadMessageSelect<T extends boolean = true> {
   video?: T;
   poster?: T;
   captions?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home-hero_select".
+ */
+export interface HomeHeroSelect<T extends boolean = true> {
+  published?: T;
+  filmLandscape?: T;
+  filmPortrait?: T;
+  posterLandscape?: T;
+  posterPortrait?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -838,6 +1675,74 @@ export interface SchoolFactsSelect<T extends boolean = true> {
   published?: T;
   cambridgeCentreNumber?: T;
   cambridgeSince?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "timetables_select".
+ */
+export interface TimetablesSelect<T extends boolean = true> {
+  published?: T;
+  schoolYear?: T;
+  rows?:
+    | T
+    | {
+        stage?: T;
+        campus?: T;
+        days?: T;
+        start?: T;
+        end?: T;
+        note?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  notifications?:
+    | T
+    | {
+        admissions?:
+          | T
+          | {
+              email?: T;
+              id?: T;
+            };
+        general?:
+          | T
+          | {
+              email?: T;
+              id?: T;
+            };
+        parents?:
+          | T
+          | {
+              email?: T;
+              id?: T;
+            };
+        careers?:
+          | T
+          | {
+              email?: T;
+              id?: T;
+            };
+      };
+  officeHours?: T;
+  gaMeasurementId?: T;
+  retention?:
+    | T
+    | {
+        inquiriesMonths?: T;
+        applicationsMonths?: T;
+        auditLogMonths?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

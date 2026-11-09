@@ -14,7 +14,7 @@ const TestimonialsSection = dynamic(() => import("./home-sections").then((m) => 
 const NewsSection = dynamic(() => import("./home-sections").then((m) => m.NewsSection), { ssr: false });
 const FaqSection = dynamic(() => import("./home-sections").then((m) => m.FaqSection), { ssr: false });
 
-function useNear<T extends HTMLElement>(margin: string) {
+export function useNear<T extends HTMLElement>(margin: string) {
   const ref = useRef<T>(null);
   const [near, setNear] = useState(false);
   useEffect(() => {

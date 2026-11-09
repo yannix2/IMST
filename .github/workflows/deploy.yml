@@ -1,17 +1,26 @@
 # Deploys the three Workers to Cloudflare, in the order their bindings need:
-#   maarif-cms (D1 + R2)  ->  maarif-api (service binding to the CMS)  ->  maarif-web (service binding to the API)
+#   maarif-cms (D1 + R2)  ->  maarif-api (service bindings to the CMS and the site)  ->  maarif-web
 # Builds run here on Linux (OpenNext needs symlinks, which Windows blocks without Developer Mode).
 #
 # Repository secrets (Settings > Secrets and variables > Actions):
 #   CLOUDFLARE_API_TOKEN   required. Account: Workers Scripts Edit, Workers R2 Storage Edit, D1 Edit,
-#                          Account Settings Read. Zone yassinekhiari.download: Workers Routes Edit,
-#                          DNS Edit, Zone Read.
+#                          Account Settings Read, Cloudflare Images Edit, Email Routing Addresses Read.
+#                          Zone yassinekhiari.download: Workers Routes Edit, DNS Edit, Zone Read.
 #   PAYLOAD_SECRET         required. A long random string (openssl rand -hex 32). Never change it
 #                          afterwards: it signs logins and API keys.
+#   REVALIDATE_SECRET      optional (wave 3). Random string shared by the three Workers: maarifcms
+#                          tells maarif-api, which tells maarif-web, which pages to refresh.
+#   MAINTENANCE_SECRET     optional (wave 3). Random string shared by maarif-api (nightly cron) and
+#                          maarifcms (retention and backup).
+#                          Both were set straight on the Workers on 2026-11-09 (wrangler secret put);
+#                          a Worker keeps its secrets across deploys. Add them here only to rotate them
+#                          (then the workflow writes the same value to every Worker).
 #   CMS_API_KEY            optional on the first run. The API key of the "api-clients" document the
 #                          API uses to read the CMS (create it in the admin after the first deploy,
 #                          add the secret, run the workflow again).
-#   TURNSTILE_SECRET       optional. Without it, Cloudflare's always-pass test key is used (demo only).
+#   TURNSTILE_SECRET       required once the repository variable LAUNCHED is "true". Before launch,
+#                          Cloudflare's always-pass test key is used (demo only).
+# Repository variable: LAUNCHED = "true" on the school's own domain (blocks demo settings).
 name: Deploy to Cloudflare
 
 on:
@@ -26,18 +35,26 @@ concurrency:
 env:
   CLOUDFLARE_ACCOUNT_ID: 2a1872156e1ff059f5ed2d0adf2bcaea
   CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  HAS_REVALIDATE: ${{ secrets.REVALIDATE_SECRET != '' }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 50
     steps:
       - name: Check the secrets
         env:
           PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
+          TURNSTILE_SECRET: ${{ secrets.TURNSTILE_SECRET }}
+          LAUNCHED: ${{ vars.LAUNCHED }}
         run: |
-          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$PAYLOAD_SECRET" ]; then
-            echo "::error::Add the repository secrets CLOUDFLARE_API_TOKEN and PAYLOAD_SECRET, then run this workflow again."
+          missing=""
+          for name in CLOUDFLARE_API_TOKEN PAYLOAD_SECRET; do
+            [ -z "${!name}" ] && missing="$missing $name"
+          done
+          if [ "$LAUNCHED" = "true" ] && [ -z "$TURNSTILE_SECRET" ]; then missing="$missing TURNSTILE_SECRET"; fi
+          if [ -n "$missing" ]; then
+            echo "::error::Add the repository secrets:$missing, then run this workflow again."
             exit 1
           fi
 
@@ -50,10 +67,15 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
 
-      - name: Test
+      - name: Typecheck and test
+        env:
+          PAYLOAD_SECRET: ci-only-test-secret
         run: |
+          pnpm typecheck
           pnpm --filter @maarif/contracts test
           pnpm --filter @maarif/api test
+          pnpm --filter @maarif/media-tools test
+          pnpm --filter @maarif/cms test:int
 
       # ---- maarif-cms -----------------------------------------------------------------------
       - name: CMS - migrate the database
@@ -64,11 +86,16 @@ jobs:
         run: |
           pnpm exec opennextjs-cloudflare build
           pnpm exec opennextjs-cloudflare deploy
-      - name: CMS - secret
+      - name: CMS - secrets
         working-directory: apps/cms
         env:
           PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
-        run: printf '%s' "$PAYLOAD_SECRET" | pnpm exec wrangler secret put PAYLOAD_SECRET
+          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+          MAINTENANCE_SECRET: ${{ secrets.MAINTENANCE_SECRET }}
+        run: |
+          printf '%s' "$PAYLOAD_SECRET" | pnpm exec wrangler secret put PAYLOAD_SECRET
+          if [ -n "$REVALIDATE_SECRET" ]; then printf '%s' "$REVALIDATE_SECRET" | pnpm exec wrangler secret put REVALIDATE_SECRET; fi
+          if [ -n "$MAINTENANCE_SECRET" ]; then printf '%s' "$MAINTENANCE_SECRET" | pnpm exec wrangler secret put MAINTENANCE_SECRET; fi
 
       # ---- maarif-api -----------------------------------------------------------------------
       - name: API - deploy
@@ -79,8 +106,12 @@ jobs:
         env:
           TURNSTILE_SECRET: ${{ secrets.TURNSTILE_SECRET }}
           CMS_API_KEY: ${{ secrets.CMS_API_KEY }}
+          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+          MAINTENANCE_SECRET: ${{ secrets.MAINTENANCE_SECRET }}
         run: |
           printf '%s' "${TURNSTILE_SECRET:-1x0000000000000000000000000000000AA}" | pnpm exec wrangler secret put TURNSTILE_SECRET
+          if [ -n "$REVALIDATE_SECRET" ]; then printf '%s' "$REVALIDATE_SECRET" | pnpm exec wrangler secret put REVALIDATE_SECRET; fi
+          if [ -n "$MAINTENANCE_SECRET" ]; then printf '%s' "$MAINTENANCE_SECRET" | pnpm exec wrangler secret put MAINTENANCE_SECRET; fi
           if [ -n "$CMS_API_KEY" ]; then
             printf '%s' "$CMS_API_KEY" | pnpm exec wrangler secret put CMS_API_KEY
           else
@@ -88,8 +119,25 @@ jobs:
           fi
 
       # ---- maarif-web -----------------------------------------------------------------------
+      # Page cache for refresh on publish (ADR 007): bucket maarif-next-cache and database
+      # maarif-next-tags were created once (2026-11-09) and are named in apps/web/wrangler.jsonc.
       - name: Site - build and deploy
         working-directory: apps/web
         run: |
           pnpm exec opennextjs-cloudflare build
           pnpm exec opennextjs-cloudflare deploy
+      - name: Site - secret
+        working-directory: apps/web
+        env:
+          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+        run: if [ -n "$REVALIDATE_SECRET" ]; then printf '%s' "$REVALIDATE_SECRET" | pnpm exec wrangler secret put REVALIDATE_SECRET; fi
+      # Pages were built before the CMS could be read here: refresh them all once (needs the
+      # secret here; without it, pages refresh by themselves within five minutes).
+      - name: Site - refresh every page from maarifcms
+        if: ${{ env.HAS_REVALIDATE == 'true' }}
+        env:
+          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+        run: |
+          curl -fsS -X POST "https://yassinekhiari.download/revalidate" \
+            -H "content-type: application/json" -H "x-revalidate-secret: $REVALIDATE_SECRET" \
+            -d '{"tags":["cms"]}' || echo "::warning::Refresh call failed; pages refresh by themselves within five minutes."

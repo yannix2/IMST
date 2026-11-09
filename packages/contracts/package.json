@@ -8,7 +8,10 @@
     "./locales": "./src/locales.ts",
     "./school": "./src/school.ts",
     "./forms": "./src/forms.ts",
-    "./content": "./src/content.ts"
+    "./content": "./src/content.ts",
+    "./media": "./src/media.ts",
+    "./pages": "./src/pages.ts",
+    "./rich-text": "./src/rich-text.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

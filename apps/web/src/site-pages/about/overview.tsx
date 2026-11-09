@@ -11,7 +11,7 @@ import { aboutFigure } from "../figures";
 // Who the school is, from confirmed sources only: the age table and campuses (lib/school.ts,
 // contracts), English as the language of instruction and the core values "respect,
 // discipline and excellence" (old site, Philosophy of Education), the Cambridge International
-// curriculum (old site, Curriculum), the Foundation's 64 countries (facts.ts). The beliefs are
+// curriculum (old site, Curriculum), the Foundation's 66 countries (facts.ts). The beliefs are
 // the old Philosophy page, lightly edited (owner decision 2026-11-05) and to be approved.
 
 type Copy = {
@@ -34,7 +34,7 @@ const copy: Record<Locale, Copy> = {
       campuses: "Le Kram: Kindergarten to Year 9. Charguia 2: Years 10 to 13",
       languages: "English as the language of teaching, with French, Arabic and Turkish",
       curriculum: "The Cambridge International curriculum, from Early Years to A Level",
-      network: "Part of the Türkiye Maarif Foundation’s schools in 64 countries",
+      network: "Part of the Türkiye Maarif Foundation’s schools in 66 countries",
     },
     believeTitle: "What we believe",
     believeLede: "Respect and fairness shape every relationship in our school community.",
@@ -55,7 +55,7 @@ const copy: Record<Locale, Copy> = {
       campuses: "Le Kram : maternelle à l’année 9. Charguia 2 : années 10 à 13",
       languages: "L’anglais comme langue d’enseignement, avec le français, l’arabe et le turc",
       curriculum: "Le programme Cambridge International, des Early Years aux A Levels",
-      network: "Membre des écoles de la Fondation Maarif de Türkiye dans 64 pays",
+      network: "Membre des écoles de la Fondation Maarif de Türkiye dans 66 pays",
     },
     believeTitle: "Ce en quoi nous croyons",
     believeLede: "Le respect et l’équité guident chaque relation dans notre communauté scolaire.",
@@ -76,7 +76,7 @@ const copy: Record<Locale, Copy> = {
       campuses: "الكرم: من الروضة إلى سنة 9. الشرقية 2: من سنة 10 إلى سنة 13",
       languages: "الإنجليزية لغة التدريس، مع الفرنسية والعربية والتركية",
       curriculum: "منهاج Cambridge International، من Early Years إلى A Level",
-      network: "جزء من مدارس وقف المعارف التركي في 64 دولة",
+      network: "جزء من مدارس وقف المعارف التركي في 66 دولة",
     },
     believeTitle: "ما نؤمن به",
     believeLede: "الاحترام والإنصاف أساس كل علاقة في مجتمعنا المدرسي.",
@@ -97,7 +97,7 @@ const copy: Record<Locale, Copy> = {
       campuses: "Le Kram: Anaokulu - Yıl 9. Charguia 2: Yıl 10-13",
       languages: "Öğretim dili İngilizce; Fransızca, Arapça ve Türkçe ile birlikte",
       curriculum: "Early Years’ten A Level’a Cambridge International müfredatı",
-      network: "Türkiye Maarif Vakfı’nın 64 ülkedeki okullarından biri",
+      network: "Türkiye Maarif Vakfı’nın 66 ülkedeki okullarından biri",
     },
     believeTitle: "Neye inanıyoruz",
     believeLede: "Okul topluluğumuzdaki her ilişkiyi saygı ve adalet belirler.",

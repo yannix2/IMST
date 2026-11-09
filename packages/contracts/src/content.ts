@@ -1,3 +1,5 @@
+import type { RichBlock } from "./rich-text";
+
 // Public content read by the site through maarif-api (/api/content/*). maarif-api builds these
 // shapes from maarifcms documents; the site renders them. Nothing here is a default: when the
 // school has not published an item, the API answers 404 and the section stays hidden.
@@ -83,3 +85,48 @@ export type HomeContent = {
   news: NewsItem[];
   faqs: FaqItem[];
 };
+
+// ---- Wave 3 (2026-11-09): every photo comes from maarifcms --------------------------------------
+// `src` is maarif-api's /api/media/<file>; the site asks for sizes with ?w=480|960|1600&f=avif|webp
+// (Cloudflare Images, ADR 008). `focus` is where the subject is, in % from the left and top.
+export type SitePhoto = { src: string; alt: string; width: number | null; height: number | null; focus: readonly [number, number] };
+
+export const mediaWidths = [480, 960, 1600] as const;
+export type MediaWidth = (typeof mediaWidths)[number];
+export const mediaFormats = ["avif", "webp", "jpeg"] as const;
+export type MediaFormat = (typeof mediaFormats)[number];
+
+/** Which photos a page shows: the header and named places inside the page. */
+export type PageVisual = { header: SitePhoto | null; slots: Record<string, SitePhoto> };
+export type PageVisuals = Record<string, PageVisual>;
+
+export type HomeHero = { landscape: string; portrait: string; posterLandscape: SitePhoto; posterPortrait: SitePhoto };
+
+export type NewsSummary = { slug: string; kind: "news" | "event"; title: string; date: string; summary: string; image: SitePhoto | null; stages: string[] };
+export type NewsArticle = NewsSummary & {
+  body: RichBlock[];
+  photos: { photo: SitePhoto; caption: string }[];
+  event: { startsAt: string | null; endsAt: string | null; place: string; registration: string } | null;
+  seo: { title: string; description: string };
+};
+export type NewsPage = { items: NewsSummary[]; page: number; pages: number };
+
+export type AlbumSummary = { slug: string; title: string; date: string; summary: string; cover: SitePhoto; count: number };
+export type Album = AlbumSummary & { photos: { photo: SitePhoto; caption: string }[]; video: { src: string; type: string } | null };
+
+export type Club = { slug: string; name: string; summary: string; body: RichBlock[]; schedule: string; partner: string; stages: string[]; campus: string | null; photo: SitePhoto | null };
+export type Trip = { slug: string; destination: string; place: string; summary: string; stages: string[]; lastVisit: string | null; photo: SitePhoto | null };
+
+export type DocumentKind = "calendar" | "handbook" | "form" | "policy" | "other";
+export type SchoolDocument = { id: string; kind: DocumentKind; title: string; summary: string; schoolYear: string; href: string; bytes: number | null; validUntil: string | null };
+
+export type JobSummary = { slug: string; title: string; summary: string; campus: string | null; contract: string | null; closesOn: string | null };
+export type Job = JobSummary & { body: RichBlock[]; startsOn: string | null };
+
+export type TimetableRow = { stage: string; campus: string | null; days: string; start: string; end: string; note: string };
+export type Timetable = { schoolYear: string; rows: TimetableRow[] };
+
+export type CmsPage = { slug: string; title: string; body: RichBlock[]; updatedAt: string; seo: { title: string; description: string } };
+
+/** Slugs the site pre-renders (news, albums, jobs) and the redirects staff set in maarifcms. */
+export type SiteIndex = { news: string[]; albums: string[]; jobs: string[]; redirects: { from: string; to: string; permanent: boolean }[] };

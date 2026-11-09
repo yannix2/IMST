@@ -19,11 +19,18 @@
     { "pattern": "www.yassinekhiari.download", "custom_domain": true }
   ],
 
-  // The public site holds NO data bindings: everything it shows comes from maarif-api over
+  // The public site holds NO school-data bindings: everything it shows comes from maarif-api over
   // a private service binding (ARCHITECTURE.md section 2); src/app/api/[...path]/route.ts
-  // forwards the browser's /api/* calls through it.
-  "services": [{ "binding": "API", "service": "maarif-api" }]
-  // Pages are pre-rendered and CMS content loads in the browser, so no page cache is needed.
-  // If revalidation is added later, the OpenNext page cache can move to R2:
-  //   "r2_buckets": [{ "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "maarif-next-cache" }]
+  // forwards the browser's /api/* calls through it, and src/lib/cms.ts reads content for pages.
+  "services": [{ "binding": "API", "service": "maarif-api" }],
+
+  // Page cache for refresh on publish (wave 3, ADR 007, open-next.config.ts). Cache only:
+  // rendered pages (R2), which pages are stale (D1, its own small database), and the queue that
+  // regenerates them (Durable Object).
+  "r2_buckets": [{ "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "maarif-next-cache" }],
+  "d1_databases": [{ "binding": "NEXT_TAG_CACHE_D1", "database_name": "maarif-next-tags", "database_id": "99ca954b-175f-4e94-9e6f-7dfa20fde333" }],
+  "durable_objects": { "bindings": [{ "name": "NEXT_CACHE_DO_QUEUE", "class_name": "DOQueueHandler" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["DOQueueHandler"] }]
+
+  // Secret (wrangler secret put REVALIDATE_SECRET): shared with maarif-api for /revalidate.
 }

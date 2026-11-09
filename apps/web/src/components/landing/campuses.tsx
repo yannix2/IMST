@@ -8,8 +8,10 @@ import { CampusGlobe } from "./campus-globe";
 
 // Where the school is: a globe turning towards Tunis (both campuses, one marker), linked to
 // the Foundation in Türkiye, and the two campus cards with the levels each one teaches,
-// one-tap phone pills and Directions into the visitor's own maps app.
-export function Campuses({ locale }: { locale: Locale }) {
+// one-tap phone pills and Directions into the visitor's own maps app. On Home (wave 2) the
+// world globe of the Foundation section takes the globe's place, so `showGlobe={false}` lays the
+// two campus cards side by side; Contact keeps the globe.
+export function Campuses({ locale, showGlobe = true }: { locale: Locale; showGlobe?: boolean }) {
   const t = messages[locale];
   const plates = [
     { key: "schools", name: t.campuses.schools, ...campuses.schools, at: campusPositions.schools },
@@ -18,12 +20,14 @@ export function Campuses({ locale }: { locale: Locale }) {
 
   return (
     <section id="contact" aria-labelledby="contact-title" className="defer-paint scroll-mt-24 bg-mist py-[var(--section-pad)]">
-      <div className="mx-auto grid max-w-[var(--content-max)] items-center gap-10 px-[var(--gutter)] lg:grid-cols-12">
-        <div className="lg:col-span-6">
-          <CampusGlobe label={t.map.label} city={t.map.city} foundation={t.map.foundation} />
-        </div>
-        <div className="flex flex-col gap-5 lg:col-span-6">
-          <h2 id="contact-title" className="text-[length:var(--text-headline)] leading-[var(--leading-headline)] font-bold text-heading">
+      <div className={showGlobe ? "mx-auto grid max-w-[var(--content-max)] items-center gap-10 px-[var(--gutter)] lg:grid-cols-12" : "mx-auto max-w-[var(--content-max)] px-[var(--gutter)]"}>
+        {showGlobe ? (
+          <div className="lg:col-span-6">
+            <CampusGlobe label={t.map.label} city={t.map.city} foundation={t.map.foundation} />
+          </div>
+        ) : null}
+        <div className={showGlobe ? "flex flex-col gap-5 lg:col-span-6" : "grid gap-5 md:grid-cols-2"}>
+          <h2 id="contact-title" className={`text-[length:var(--text-headline)] leading-[var(--leading-headline)] font-bold text-heading ${showGlobe ? "" : "md:col-span-2"}`}>
             {t.campuses.title}
           </h2>
           {plates.map((plate) => (
@@ -65,7 +69,7 @@ export function Campuses({ locale }: { locale: Locale }) {
               </ul>
             </article>
           ))}
-          <div className="flex flex-wrap items-center gap-3">
+          <div className={`flex flex-wrap items-center gap-3 ${showGlobe ? "" : "md:col-span-2"}`}>
             <span className="text-slate">{t.campuses.email}</span>
             <Button asChild variant="outline">
               <a href={`mailto:${schoolEmail}`}>

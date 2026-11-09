@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { formKinds, grades, locales } from '@maarif/contracts'
 import { hasRole, isGateway } from '../access/roles'
+import { inquiriesCsv } from '../endpoints/exportCsv'
 
 // Form entries from the public site (pre-registration, visit booking, contact).
 // Personal data: only admissions staff and administrators can read them; only the
@@ -11,7 +12,9 @@ export const Inquiries: CollectionConfig = {
     useAsTitle: 'contactName',
     defaultColumns: ['contactName', 'kind', 'grade', 'status', 'createdAt'],
     group: 'Admissions',
+    components: { beforeListTable: [{ path: '/components/admin/ExportButton#ExportButton', clientProps: { collection: 'inquiries' } }] },
   },
+  endpoints: [inquiriesCsv],
   access: {
     create: ({ req }) => isGateway(req),
     read: ({ req }) => hasRole(req, 'admissions'),

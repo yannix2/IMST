@@ -2,10 +2,23 @@
 // Owner decision 2026-11-05: show the Foundation's own published figure and the school's
 // accreditations below. Change a value here only with a newer source; never round up.
 
+// Türkiye Maarif Foundation, its own "Maarif in the world" page (owner decision 2026-11-06,
+// replaces the 64 countries of December 2025). Read on the date below; check again before launch.
+export const foundation = {
+  source: "https://turkiyemaarif.org/dunyada-maarif",
+  read: "2026-11-06",
+  website: "https://turkiyemaarif.org/",
+  countries: 66,
+  institutions: 604,
+  schools: 516,
+  students: 75000, // shown as "75,000+": the page says "75.000+"
+  universities: 2,
+  dormitories: 55,
+} as const;
+
 export const facts = {
-  // Türkiye Maarif Foundation: "64 countries" (president's statement, December 2025;
-  // Ministry of National Education, 2025 education diplomacy overview, January 2026).
-  networkCountries: 64,
+  // The Foundation's network (see `foundation` above).
+  networkCountries: foundation.countries,
   // The four languages of school life (product.md, Positioning).
   languages: 4,
   // The two campuses on the school's contact page (lib/school.ts).
@@ -15,7 +28,7 @@ export const facts = {
 } as const;
 
 // [PROPOSAL] Wording to confirm with the administration; certificates, centre numbers and dates
-// still to be provided (product.md, Evidence on Hand). No logos: each body's mark is its own.
+// still to be provided (product.md, Evidence on Hand).
 export const accreditations = ["cambridge", "ministry", "maarif"] as const;
 export type Accreditation = (typeof accreditations)[number];
 

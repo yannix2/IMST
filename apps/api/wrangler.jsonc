@@ -10,7 +10,27 @@
   "workers_dev": false,
   "preview_urls": false,
 
-  "services": [{ "binding": "CMS", "service": "maarif-cms" }],
+  "services": [
+    { "binding": "CMS", "service": "maarif-cms" },
+    // Refresh on publish (ADR 007): maarif-api tells maarif-web which pages changed.
+    { "binding": "WEB", "service": "maarif-web" }
+  ],
+
+  // Resizes CMS photos for the site (ADR 008). Free tier: 5,000 unique transformations a month;
+  // results are cached at the edge.
+  "images": { "binding": "IMAGES" },
+
+  // Staff notifications (ADR 009). Needs Cloudflare Email Routing on the sender's domain; only
+  // verified destination addresses receive mail.
+  "send_email": [{ "name": "MAILER" }],
+
+  "vars": {
+    "ADMIN_URL": "https://cms.yassinekhiari.download",
+    "MAIL_FROM": "noreply@yassinekhiari.download"
+  },
+
+  // Nightly retention and backup in maarifcms, at 03:00 Tunis time (02:00 UTC). See src/scheduled.ts.
+  "triggers": { "crons": ["0 2 * * *"] },
 
   "ratelimits": [
     {
@@ -22,5 +42,5 @@
   ]
 
   // Secrets, set with `wrangler secret put <NAME>` (locally in .dev.vars):
-  //   TURNSTILE_SECRET, CMS_API_KEY
+  //   TURNSTILE_SECRET, CMS_API_KEY, REVALIDATE_SECRET, MAINTENANCE_SECRET
 }

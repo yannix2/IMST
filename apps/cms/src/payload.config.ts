@@ -7,6 +7,12 @@ import { fileURLToPath } from 'url'
 import { CloudflareContext, getCloudflareContext } from '@opennextjs/cloudflare'
 import { GetPlatformProxyOptions } from 'wrangler'
 import { r2Storage } from '@payloadcms/storage-r2'
+import { ar } from '@payloadcms/translations/languages/ar'
+import { en } from '@payloadcms/translations/languages/en'
+import { fr } from '@payloadcms/translations/languages/fr'
+import { tr } from '@payloadcms/translations/languages/tr'
+import { AuditLog, auditLogPlugin } from './collections/AuditLog'
+import { maintenance } from './endpoints/maintenance'
 
 import { ApiClients } from './collections/ApiClients'
 import { Inquiries } from './collections/Inquiries'
@@ -18,9 +24,21 @@ import { News } from './collections/News'
 import { Faqs } from './collections/Faqs'
 import { People } from './collections/People'
 import { Testimonials } from './collections/Testimonials'
+import { Albums } from './collections/Albums'
+import { Applications } from './collections/Applications'
+import { Clubs } from './collections/Clubs'
+import { Documents } from './collections/Documents'
+import { Jobs } from './collections/Jobs'
+import { PageVisuals } from './collections/PageVisuals'
+import { PrivateFiles } from './collections/PrivateFiles'
+import { Redirects } from './collections/Redirects'
+import { Trips } from './collections/Trips'
 import { Gallery } from './globals/Gallery'
 import { HeadMessage } from './globals/HeadMessage'
+import { HomeHero } from './globals/HomeHero'
 import { SchoolFacts } from './globals/SchoolFacts'
+import { SiteSettings } from './globals/SiteSettings'
+import { Timetables } from './globals/Timetables'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -74,12 +92,51 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    // Wave 3: the school's branding and a home screen of what needs attention.
+    meta: {
+      titleSuffix: ' · maarifcms',
+      description: 'maarifcms, the website administration of International Maarif Schools of Tunisia',
+      icons: [{ rel: 'icon', type: 'image/svg+xml', url: '/brand/maarif-symbol.svg' }],
+    },
+    components: {
+      graphics: { Logo: '/components/admin/Graphics#Logo', Icon: '/components/admin/Graphics#Icon' },
+      beforeDashboard: ['/components/admin/Dashboard#Dashboard'],
+    },
+  },
+  // The admin itself in the staff's languages (owner decision 2026-11-09); each person picks one
+  // in their account settings. Content languages are separate (localization below).
+  i18n: {
+    supportedLanguages: { en, fr, ar, tr },
+    fallbackLanguage: 'en',
   },
   // REST lives under /cms-api so the public /api/* path belongs to maarif-api (ARCHITECTURE.md section 2).
   routes: { api: '/cms-api', admin: '/admin' },
   graphQL: { disable: true },
-  collections: [Users, ApiClients, Pages, Media, Inquiries, WeeklyMenus, News, Faqs, Testimonials, People],
-  globals: [HeadMessage, Gallery, SchoolFacts],
+  collections: [
+    Users,
+    ApiClients,
+    Pages,
+    PageVisuals,
+    Media,
+    Inquiries,
+    WeeklyMenus,
+    News,
+    Albums,
+    Clubs,
+    Trips,
+    Faqs,
+    Testimonials,
+    People,
+    Documents,
+    Jobs,
+    Applications,
+    PrivateFiles,
+    Redirects,
+    AuditLog,
+  ],
+  globals: [HeadMessage, HomeHero, Gallery, SchoolFacts, Timetables, SiteSettings],
+  // Nightly retention and backup, called by maarif-api's cron (endpoints/maintenance.ts).
+  endpoints: [maintenance],
   localization: {
     locales: [
       { code: 'en', label: 'English' },
@@ -102,9 +159,12 @@ export default buildConfig({
   }),
   logger: isProduction ? cloudflareLogger : undefined,
   plugins: [
+    // Who changed what, and when (collections/AuditLog.ts).
+    auditLogPlugin,
     r2Storage({
       bucket: cloudflare.env.R2,
-      collections: { media: true },
+      // CVs sit under their own prefix; only administrators can read them (collections/PrivateFiles.ts).
+      collections: { media: true, 'private-files': { prefix: 'private' } },
     }),
   ],
 })

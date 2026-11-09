@@ -11,5 +11,7 @@ export default defineConfig({
     hookTimeout: 120_000,
     setupFiles: ['./vitest.setup.ts'],
     include: ['tests/int/**/*.int.spec.ts'],
+    // One local D1 database: test files take turns, or SQLite reports "database is locked".
+    fileParallelism: false,
   },
 })

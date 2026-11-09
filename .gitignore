@@ -25,3 +25,9 @@ apps/web/hairline/hairline-*
 *.log
 .DS_Store
 Thumbs.db
+
+# Local maarifcms administrator password (apps/cms/src/seed/dev-setup.ts)
+.dev-admin.txt
+
+# Media inbox baseline: this computer's list of every file in IMSTMEDIA (folder names include guests' names); local only.
+tools/media/inventory.json

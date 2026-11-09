@@ -21,6 +21,8 @@
   --color-night: var(--night);
   --color-turquoise: var(--turquoise);
   --color-turquoise-ink: var(--turquoise-ink);
+  --color-turquoise-wash: var(--turquoise-wash);
+  --color-on-turquoise: var(--on-turquoise);
   --color-level-kindergarten: var(--level-kindergarten);
   --color-level-primary: var(--level-primary);
   --color-level-secondary: var(--level-secondary);
@@ -82,8 +84,9 @@
   --secondary-foreground: var(--navy);
   --muted: var(--mist);
   --muted-foreground: var(--slate);
-  --accent: var(--mist);
-  --accent-foreground: var(--navy);
+  /* Hover and selected backgrounds take the turquoise wash (turquoise leads, 2026-11-06). */
+  --accent: var(--turquoise-wash);
+  --accent-foreground: var(--heading);
   --destructive: var(--notice);
   --border: var(--rule);
   --input: var(--rule);
@@ -209,6 +212,161 @@
 }
 .script-in {
   animation: script-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Hairline icons (wave 2, components/hairline/icon.tsx): the figures' still frames, styled like
+   the live stage (kernel.js): plates in the surface colour, edges in the text colour, the lit
+   part turquoise, back lines faded. */
+.hl-icon :where(path, circle) {
+  fill: var(--hl-icon-plate, var(--surface));
+  stroke: currentColor;
+  stroke-width: 1.4px;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.hl-icon :where(.nf) {
+  fill: none;
+}
+.hl-icon :where(.lo) {
+  stroke: color-mix(in oklch, currentColor 42%, transparent);
+}
+.hl-icon :where(.hi) {
+  stroke: var(--turquoise);
+  stroke-width: 2px;
+}
+
+/* Card fan (wave 2, components/twentyfirst/card-fan-carousel.tsx): the fan's height is fixed per
+   width so the section never moves while GSAP lays the cards out. */
+.fan-layout {
+  height: 25rem;
+}
+/* The fan plus its controls, reserved before the carousel's chunk arrives (life-fan.tsx). */
+.life-fan-box {
+  min-height: calc(25rem + 4.25rem);
+  margin-top: 2rem;
+}
+@media (min-width: 640px) {
+  .life-fan-box {
+    min-height: calc(30rem + 4.25rem);
+  }
+}
+@media (min-width: 1024px) {
+  .life-fan-box {
+    min-height: calc(36rem + 4.25rem);
+  }
+}
+.fan-card {
+  position: absolute;
+  width: 14rem;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius-plate);
+  opacity: 0;
+  will-change: transform;
+}
+@media (min-width: 640px) {
+  .fan-layout {
+    height: 30rem;
+  }
+  .fan-card {
+    width: 16rem;
+  }
+}
+@media (min-width: 1024px) {
+  .fan-layout {
+    height: 36rem;
+  }
+  .fan-card {
+    width: 19rem;
+  }
+}
+.fan-arrow {
+  display: inline-flex;
+  width: var(--target-min);
+  height: var(--target-min);
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--heading);
+  background: var(--surface);
+  box-shadow: var(--depth-rest);
+  outline: 1px solid var(--rule);
+  transition: background-color 200ms ease, color 200ms ease;
+}
+.fan-arrow:hover {
+  background: var(--turquoise);
+  color: var(--on-turquoise);
+}
+.fan-arrow:focus-visible {
+  outline: 3px solid var(--turquoise-ink);
+  outline-offset: 2px;
+}
+
+/* Flip cards (wave 2, components/site/flip-card.tsx): two faces in one fixed box. */
+.flip-card {
+  perspective: 1400px;
+  border-radius: var(--radius-plate);
+}
+.flip-card-inner {
+  position: relative;
+  height: 100%;
+  border-radius: inherit;
+  transform-style: preserve-3d;
+  transition: transform 640ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.flip-card[data-flipped] .flip-card-inner {
+  transform: rotateY(180deg);
+}
+.flip-card-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  backface-visibility: hidden;
+}
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .flip-card-inner {
+    transition: none;
+  }
+  .flip-card[data-flipped] .flip-card-inner,
+  .flip-card-back {
+    transform: none;
+  }
+  .flip-card-face {
+    transition: opacity 200ms ease;
+  }
+  .flip-card-back,
+  .flip-card[data-flipped] .flip-card-face:not(.flip-card-back) {
+    opacity: 0;
+  }
+  .flip-card[data-flipped] .flip-card-back {
+    opacity: 1;
+  }
+}
+
+/* The hero film's veil (wave 2): night navy, deepest behind the words. Phones carry the words
+   at the bottom, so the veil deepens downwards; from md the words sit on the start side, so it
+   deepens towards the start edge (mirrored in Arabic). White text keeps >= 5.6:1 over the
+   brightest frame where it sits. */
+.hero-veil {
+  background:
+    linear-gradient(to top, rgb(11 42 71 / 0.92) 0%, rgb(11 42 71 / 0.74) 42%, rgb(11 42 71 / 0.28) 78%, rgb(11 42 71 / 0.45) 100%);
+}
+@media (min-width: 48rem) {
+  .hero-veil {
+    background:
+      linear-gradient(to top, rgb(11 42 71 / 0.55) 0%, transparent 35%),
+      linear-gradient(to right, rgb(11 42 71 / 0.88) 0%, rgb(11 42 71 / 0.74) 46%, rgb(11 42 71 / 0.2) 100%);
+  }
+  [dir="rtl"] .hero-veil {
+    background:
+      linear-gradient(to top, rgb(11 42 71 / 0.55) 0%, transparent 35%),
+      linear-gradient(to left, rgb(11 42 71 / 0.88) 0%, rgb(11 42 71 / 0.74) 46%, rgb(11 42 71 / 0.2) 100%);
+  }
 }
 
 /* Changing language flips the headline plate: a cross-document view transition, no JS.

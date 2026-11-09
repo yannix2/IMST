@@ -6,13 +6,16 @@
 //     and a drag springs back to that point;
 //   - it stops drawing while off screen and holds still under reduced motion;
 //   - labels use the site's type (Readex Pro, sentence case) and navy/white pills;
-//   - colours come from props so the caller can follow the light and dark themes.
+//   - colours come from props so the caller can follow the light and dark themes;
+//   - (wave 2) a new `focus` turns the globe there smoothly instead of rebuilding it; markers may
+//     carry no label and have their own size; `highlight` shows one extra label (the world
+//     globe's chosen country) without rebuilding the globe.
 // Labels sit on CSS Anchor Positioning; browsers without it simply show the globe.
 
 import { useEffect, useRef } from "react";
 import createGlobe from "cobe";
 
-export type GlobeMarker = { id: string; location: [number, number]; label: string };
+export type GlobeMarker = { id: string; location: [number, number]; label?: string; size?: number };
 export type GlobeArc = { id: string; from: [number, number]; to: [number, number]; label?: string };
 type RGB = [number, number, number];
 
@@ -20,6 +23,7 @@ type Props = {
   markers: GlobeMarker[];
   arcs?: GlobeArc[];
   focus: [number, number];
+  highlight?: { id: string; label: string } | null;
   className?: string;
   dark?: number;
   baseColor: RGB;
@@ -27,23 +31,35 @@ type Props = {
   arcColor: RGB;
   glowColor: RGB;
   mapBrightness?: number;
+  arcHeight?: number;
   label: string;
 };
 
 const rad = (deg: number) => (deg * Math.PI) / 180;
+// Longitude turns phi, latitude tilts theta.
+const facing = ([lat, lon]: [number, number]) => ({ phi: Math.PI - (rad(lon) - Math.PI / 2), theta: rad(lat) * 0.75 });
+// The shortest way round from one angle to another.
+const turn = (from: number, to: number) => from + ((((to - from + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) - Math.PI;
 
-export function Globe({ markers, arcs = [], focus, className = "", dark = 0, baseColor, markerColor, arcColor, glowColor, mapBrightness = 6, label }: Props) {
+export function Globe({ markers, arcs = [], focus, highlight = null, className = "", dark = 0, baseColor, markerColor, arcColor, glowColor, mapBrightness = 6, arcHeight = 0.3, label }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drag = useRef<{ x: number; y: number } | null>(null);
   const offset = useRef({ phi: 0, theta: 0 });
+  const target = useRef(facing(focus));
+  const wakeRef = useRef<() => void>(() => {});
+
+  // A new focus: turn there (the drawing loop eases towards the target).
+  useEffect(() => {
+    const next = facing(focus);
+    target.current = { phi: turn(target.current.phi, next.phi), theta: next.theta };
+    wakeRef.current();
+  }, [focus]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // Face the focus point: longitude turns phi, latitude tilts theta.
-    const phi0 = Math.PI - (rad(focus[1]) - Math.PI / 2);
-    const theta0 = rad(focus[0]) * 0.75;
+    const view = { ...target.current };
     let globe: ReturnType<typeof createGlobe> | null = null;
     let raf = 0;
     let visible = false;
@@ -58,13 +74,19 @@ export function Globe({ markers, arcs = [], focus, className = "", dark = 0, bas
         offset.current.phi *= 0.94;
         offset.current.theta *= 0.94;
       }
+      // Ease towards the focus (at once under reduced motion).
+      const k = still ? 1 : 0.06;
+      view.phi += (target.current.phi - view.phi) * k;
+      view.theta += (target.current.theta - view.theta) * k;
+      const turning = Math.abs(target.current.phi - view.phi) > 0.001 || Math.abs(target.current.theta - view.theta) > 0.001;
       const sway = still ? 0 : Math.sin(t * 0.35) * 0.22;
-      globe.update({ phi: phi0 + sway + offset.current.phi, theta: theta0 + offset.current.theta });
-      if (!still || drag.current || Math.abs(offset.current.phi) > 0.001) raf = requestAnimationFrame(frame);
+      globe.update({ phi: view.phi + sway + offset.current.phi, theta: view.theta + offset.current.theta });
+      if (!still || turning || drag.current || Math.abs(offset.current.phi) > 0.001) raf = requestAnimationFrame(frame);
     };
     const wake = () => {
       if (!raf) raf = requestAnimationFrame(frame);
     };
+    wakeRef.current = wake;
 
     const init = () => {
       const width = canvas.offsetWidth;
@@ -74,8 +96,8 @@ export function Globe({ markers, arcs = [], focus, className = "", dark = 0, bas
         devicePixelRatio: dpr,
         width,
         height: width,
-        phi: phi0,
-        theta: theta0,
+        phi: view.phi,
+        theta: view.theta,
         dark,
         diffuse: 1.4,
         mapSamples: 16000,
@@ -84,11 +106,11 @@ export function Globe({ markers, arcs = [], focus, className = "", dark = 0, bas
         markerColor,
         glowColor,
         markerElevation: 0.02,
-        markers: markers.map((m) => ({ location: m.location, size: 0.06, id: m.id })),
+        markers: markers.map((m) => ({ location: m.location, size: m.size ?? 0.06, id: m.id })),
         arcs: arcs.map((a) => ({ from: a.from, to: a.to, id: a.id })),
         arcColor,
         arcWidth: 0.6,
-        arcHeight: 0.3,
+        arcHeight,
         opacity: 0.85,
       });
       canvas.style.opacity = "1";
@@ -124,9 +146,16 @@ export function Globe({ markers, arcs = [], focus, className = "", dark = 0, bas
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
       cancelAnimationFrame(raf);
+      wakeRef.current = () => {};
       globe?.destroy();
     };
-  }, [markers, arcs, focus, dark, baseColor, markerColor, arcColor, glowColor, mapBrightness]);
+  }, [markers, arcs, dark, baseColor, markerColor, arcColor, glowColor, mapBrightness, arcHeight]);
+
+  const pills = [
+    ...markers.filter((m) => m.label && m.id !== highlight?.id).map((m) => ({ id: m.id, label: m.label!, anchor: `--cobe-${m.id}`, tone: "marker" as const })),
+    ...(highlight ? [{ id: highlight.id, label: highlight.label, anchor: `--cobe-${highlight.id}`, tone: "marker" as const }] : []),
+    ...arcs.filter((a) => a.label).map((a) => ({ id: a.id, label: a.label!, anchor: `--cobe-arc-${a.id}`, tone: "arc" as const })),
+  ];
 
   return (
     <div className={`relative aspect-square select-none ${className}`}>
@@ -141,7 +170,7 @@ export function Globe({ markers, arcs = [], focus, className = "", dark = 0, bas
         className="size-full rounded-full opacity-0 transition-opacity duration-1000"
         style={{ cursor: "grab", touchAction: "pan-y", contain: "layout paint size" }}
       />
-      {[...markers.map((m) => ({ ...m, anchor: `--cobe-${m.id}`, tone: "marker" as const })), ...arcs.filter((a) => a.label).map((a) => ({ id: a.id, label: a.label!, anchor: `--cobe-arc-${a.id}`, tone: "arc" as const }))].map((item) => (
+      {pills.map((item) => (
         <div
           key={item.anchor}
           aria-hidden="true"

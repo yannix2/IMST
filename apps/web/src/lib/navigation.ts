@@ -1,6 +1,6 @@
 // The site's page tree (site_map.md, 7-item menu), in one place. The header menu, the phone
 // sheet, the footer, breadcrumbs, the sitemap, hreflang and the inner-page route all read it.
-// Areas of wave 2 (plan: docs/plans/2026-11-05-wave-1.md) are listed but not built, so they
+// Areas of wave 3 (Campus life, Parents, Careers, Legal; see docs/plans/2026-11-05-wave-1.md) are listed but not built, so they
 // stay out of every menu until their pages exist.
 
 export const pageKeys = [

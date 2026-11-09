@@ -1,0 +1,22 @@
+{
+  "name": "@maarif/media-tools",
+  "private": true,
+  "type": "module",
+  "description": "Turns the school's own photos and videos (E:\\IMST\\IMSTMEDIA, never committed) into the optimised files the site serves. See docs/plans/2026-11-06-wave-2.md, task 1.",
+  "scripts": {
+    "inbox": "node inbox.mjs",
+    "sheets": "node contact-sheets.mjs",
+    "media": "node build-media.mjs",
+    "film": "node hero-film.mjs",
+    "upload": "node upload-to-cms.mjs",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@maarif/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "heic-convert": "^2.1.0",
+    "sharp": "0.35.5",
+    "vitest": "^3.2.0"
+  }
+}

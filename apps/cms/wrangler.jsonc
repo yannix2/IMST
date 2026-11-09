@@ -39,5 +39,11 @@
   "workers_dev": false,
   "preview_urls": false,
   "routes": [{ "pattern": "cms.yassinekhiari.download", "custom_domain": true }],
-  "vars": { "PAYLOAD_PUBLIC_SERVER_URL": "https://cms.yassinekhiari.download" }
+  // SITE_URL: the public site, for the admin's "View on site" buttons (wave 3).
+  "vars": { "PAYLOAD_PUBLIC_SERVER_URL": "https://cms.yassinekhiari.download", "SITE_URL": "https://yassinekhiari.download" },
+
+  // Refresh on publish (wave 3, ADR 007): after staff publish, maarifcms tells maarif-api which
+  // pages changed (src/hooks/revalidate.ts). Secrets: REVALIDATE_SECRET (the same as maarif-api's),
+  // MAINTENANCE_SECRET (nightly retention and backup, called by maarif-api's cron).
+  "services": [{ "binding": "API", "service": "maarif-api" }]
 }

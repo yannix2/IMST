@@ -1,5 +1,7 @@
 import { APIError, type CollectionConfig } from 'payload'
 import { hasRole, publishedOrStaff } from '../access/roles'
+import { refreshHooks, tagsFor } from '../hooks/revalidate'
+import { viewOnSite } from '../fields/common'
 
 // Lowercase words joined by hyphens, in any script (Arabic slugs allowed).
 const SLUG = /^[\p{Ll}\p{Lo}\p{N}]+(?:-[\p{Ll}\p{Lo}\p{N}]+)*$/u
@@ -10,6 +12,8 @@ export const Pages: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', '_status', 'updatedAt'],
     group: 'Content',
+    // Legal pages live at the site's top level (/en/privacy, /en/cookies, /en/terms).
+    preview: viewOnSite(''),
   },
   versions: { drafts: true, maxPerDoc: 25 },
   access: {
@@ -28,6 +32,8 @@ export const Pages: CollectionConfig = {
         return data
       },
     ],
+    // Free pages (legal: privacy, cookies, terms) refresh their own page when published (ADR 007).
+    ...refreshHooks(tagsFor('pages', true)),
   },
   fields: [
     { name: 'title', type: 'text', required: true, localized: true, maxLength: 120 },

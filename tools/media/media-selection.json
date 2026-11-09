@@ -1,0 +1,332 @@
+{
+  "$comment": "Photos approved by the owner (checkpoint A, 2026-11-06). Sources are relative to E:\\IMST\\IMSTMEDIA (never committed). consent: 'non-identifiable' = no student recognisable (hands, backs, distant, objects); 'adults' = only adults recognisable (owner decision 2026-11-06). crop = fractions of the source kept before resizing. focus = [x, y] fractions for cover cropping. Alt text FR/AR/TR awaits native-speaker review.",
+  "photos": [
+    {
+      "id": "microscope-hands",
+      "src": "imstSM2526/Social Media 2025 - 2026/Microscope Experiment/IMG_9123.JPG",
+      "event": "microscope",
+      "consent": "non-identifiable",
+      "focus": [0.4, 0.55],
+      "alt": {
+        "en": "A student's hands adjusting a microscope next to a worksheet",
+        "fr": "Les mains d'un élève règlent un microscope à côté d'une fiche de travail",
+        "ar": "يدا تلميذ تضبطان مجهرًا بجانب ورقة عمل",
+        "tr": "Bir öğrencinin elleri, çalışma kâğıdının yanında mikroskobu ayarlıyor"
+      }
+    },
+    {
+      "id": "ebru-hands",
+      "src": "imstSM2526/Social Media 2025 - 2026/Traditional Day 2026/11.JPG",
+      "event": "traditional-day",
+      "consent": "non-identifiable",
+      "focus": [0.45, 0.5],
+      "alt": {
+        "en": "Hands painting ebru, Turkish paper marbling, on a tray of coloured water",
+        "fr": "Des mains peignent un ebru, le papier marbré turc, sur un bac d'eau colorée",
+        "ar": "يدان ترسمان فن الإيبرو، الرسم التركي على الماء، في صينية من الماء الملوّن",
+        "tr": "Renkli su dolu bir teknede ebru yapan eller"
+      }
+    },
+    {
+      "id": "archery-targets",
+      "src": "imstSM2526/Social Media 2025 - 2026/ARCHERY/IMG_8755.JPG",
+      "event": "archery",
+      "consent": "non-identifiable",
+      "focus": [0.35, 0.5],
+      "alt": {
+        "en": "Arrows in traditional Turkish archery targets in the school sports hall",
+        "fr": "Des flèches plantées dans des cibles de tir à l'arc traditionnel turc, au gymnase de l'école",
+        "ar": "سهام مغروسة في أهداف الرماية التركية التقليدية في القاعة الرياضية للمدرسة",
+        "tr": "Okulun spor salonunda geleneksel Türk okçuluğu hedeflerine saplanmış oklar"
+      }
+    },
+    {
+      "id": "tracing-hands",
+      "src": "imstSM2526/Social Media 2025 - 2026/Kind Words Activity/IMG_9002.JPG",
+      "event": "kind-words",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.5],
+      "alt": {
+        "en": "A hand traces a classmate's outline in pencil on a large sheet of paper",
+        "fr": "Une main trace au crayon la silhouette d'un camarade sur une grande feuille",
+        "ar": "يد ترسم بالقلم حدود جسم زميل على ورقة كبيرة",
+        "tr": "Bir el, büyük bir kâğıda kurşun kalemle arkadaşının silüetini çiziyor"
+      }
+    },
+    {
+      "id": "graduation-plaque",
+      "src": "imstSM2526/Social Media 2025 - 2026/Year 13 Graduation/Selection/78.JPG",
+      "event": "graduation",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.45],
+      "alt": {
+        "en": "A hammer fixing a name plate to the graduating class's wooden plaque",
+        "fr": "Un marteau fixe une plaque nominative sur le trophée en bois de la promotion",
+        "ar": "مطرقة تثبّت لوحة اسم على لوحة الدفعة الخشبية للمتخرجين",
+        "tr": "Mezun sınıfın ahşap plaketine isim levhası çakan bir çekiç"
+      }
+    },
+    {
+      "id": "kindergarten-classroom",
+      "src": "imstSM2526/Social Media 2025 - 2026/Teeth Brushing Workshop/Selection/20251021_081937960_iOS.heic",
+      "event": "teeth-brushing",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.45],
+      "alt": {
+        "en": "A Kindergarten classroom with a painted jungle mural, small tables and a giant toothbrushing model",
+        "fr": "Une classe de maternelle avec une fresque de la jungle, de petites tables et une grande mâchoire pour apprendre à se brosser les dents",
+        "ar": "قسم في الروضة بجدارية غابة ملوّنة وطاولات صغيرة ونموذج كبير لتعلّم تنظيف الأسنان",
+        "tr": "Orman duvar resmi, küçük masalar ve büyük bir diş fırçalama modeli olan bir anaokulu sınıfı"
+      }
+    },
+    {
+      "id": "farm-pond",
+      "src": "imstSM2526/Social Media 2025 - 2026/Fermenti Farm Trip/WhatsApp Image 2025-11-21 at 4.55.54 PM.jpeg",
+      "event": "farm-trip",
+      "consent": "non-identifiable",
+      "focus": [0.6, 0.5],
+      "alt": {
+        "en": "A pupil, seen from behind, watches ducks on a farm pond during a school trip",
+        "fr": "Un élève, vu de dos, observe des canards sur l'étang d'une ferme pendant une sortie scolaire",
+        "ar": "تلميذ من الخلف يراقب البطّ في بركة مزرعة خلال رحلة مدرسية",
+        "tr": "Okul gezisinde arkadan görünen bir öğrenci çiftlik göletindeki ördekleri izliyor"
+      }
+    },
+    {
+      "id": "kindergarten-farm-corner",
+      "src": "imstSM2526/Social Media 2025 - 2026/Farm Animals/IMG_9708.JPG",
+      "event": "farm-animals",
+      "consent": "non-identifiable",
+      "focus": [0.4, 0.55],
+      "alt": {
+        "en": "A Kindergarten child leans over the straw of the farm-animals corner beside a painted cow",
+        "fr": "Un enfant de maternelle se penche sur la paille du coin des animaux de la ferme, à côté d'une vache peinte",
+        "ar": "طفل من الروضة ينحني فوق القشّ في ركن حيوانات المزرعة بجانب بقرة مرسومة",
+        "tr": "Bir anaokulu öğrencisi, boyalı bir ineğin yanında çiftlik hayvanları köşesindeki samana eğiliyor"
+      }
+    },
+    {
+      "id": "primary-microscope",
+      "src": "imstSM2526/Social Media 2025 - 2026/Microscope Experiment/IMG_9121.JPG",
+      "event": "microscope",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.6],
+      "alt": {
+        "en": "A pupil bends over a microscope in the science room",
+        "fr": "Un élève penché sur un microscope en salle de sciences",
+        "ar": "تلميذ ينحني على مجهر في قاعة العلوم",
+        "tr": "Fen sınıfında mikroskoba eğilmiş bir öğrenci"
+      }
+    },
+    {
+      "id": "secondary-archery",
+      "src": "imstSM2526/Social Media 2025 - 2026/ARCHERY/IMG_8734.JPG",
+      "event": "archery",
+      "consent": "non-identifiable",
+      "focus": [0.6, 0.45],
+      "alt": {
+        "en": "Students line up with bows across the sports hall for traditional archery",
+        "fr": "Des élèves alignés avec leurs arcs dans le gymnase pour le tir à l'arc traditionnel",
+        "ar": "تلاميذ يصطفّون بأقواسهم في القاعة الرياضية للرماية التقليدية",
+        "tr": "Öğrenciler geleneksel okçuluk için spor salonunda yaylarıyla sıraya girmiş"
+      }
+    },
+    {
+      "id": "university-visit",
+      "src": "imstSM2526/Social Media 2025 - 2026/University Visit/IMG_9270.JPG",
+      "event": "university-visit",
+      "consent": "adults",
+      "focus": [0.3, 0.45],
+      "alt": {
+        "en": "A university guest speaks to secondary students about their next steps",
+        "fr": "Une invitée d'une université parle aux élèves du secondaire de leur avenir",
+        "ar": "ضيفة من جامعة تتحدث إلى تلاميذ الثانوي عن خطواتهم القادمة",
+        "tr": "Bir üniversite konuğu lise öğrencilerine gelecekteki adımlarını anlatıyor"
+      }
+    },
+    {
+      "id": "back-to-school",
+      "src": "imstSM2526/Social Media 2025 - 2026/Back to school/IMG_8403.JPG",
+      "event": "back-to-school",
+      "consent": "non-identifiable",
+      "focus": [0.35, 0.5],
+      "alt": {
+        "en": "A welcome-back sign framed with balloons at the school entrance",
+        "fr": "Un panneau de bienvenue entouré de ballons à l'entrée de l'école",
+        "ar": "لافتة ترحيب محاطة بالبالونات عند مدخل المدرسة",
+        "tr": "Okul girişinde balonlarla süslenmiş bir hoş geldin panosu"
+      }
+    },
+    {
+      "id": "teachers-day-staff",
+      "src": "imstSM2526/Social Media 2025 - 2026/Teachers Day/IMG_8915.JPG",
+      "event": "teachers-day",
+      "consent": "adults",
+      "focus": [0.5, 0.5],
+      "alt": {
+        "en": "Teachers gather around a table for the Teachers' Day celebration",
+        "fr": "Les enseignants réunis autour d'une table pour la Journée des enseignants",
+        "ar": "المعلمون مجتمعون حول طاولة للاحتفال بيوم المعلم",
+        "tr": "Öğretmenler Günü kutlaması için bir masa etrafında toplanan öğretmenler"
+      }
+    },
+    {
+      "id": "archery-hall",
+      "src": "imstSM2526/Social Media 2025 - 2026/ARCHERY/IMG_8566.JPG",
+      "event": "archery",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.5],
+      "alt": {
+        "en": "Targets and cones set out in the sports hall before the archery event",
+        "fr": "Cibles et plots installés dans le gymnase avant la journée de tir à l'arc",
+        "ar": "أهداف ومخاريط معدّة في القاعة الرياضية قبل فعالية الرماية",
+        "tr": "Okçuluk etkinliği öncesi spor salonuna yerleştirilmiş hedefler ve dubalar"
+      }
+    },
+    {
+      "id": "teeth-brushing-hands",
+      "src": "imstSM2526/Social Media 2025 - 2026/Teeth Brushing Workshop/Selection/20251021_083807000_iOS.jpg",
+      "event": "teeth-brushing",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.5],
+      "alt": {
+        "en": "A child's hand on a paper face with a big smile, made in the toothbrushing workshop",
+        "fr": "La main d'un enfant sur un visage en papier au grand sourire, fait pendant l'atelier brossage des dents",
+        "ar": "يد طفل على وجه ورقي بابتسامة كبيرة صُنع في ورشة تنظيف الأسنان",
+        "tr": "Diş fırçalama atölyesinde yapılan, kocaman gülümseyen kâğıt yüz üzerinde bir çocuğun eli"
+      }
+    },
+    {
+      "id": "kind-words-paper",
+      "src": "imstSM2526/Social Media 2025 - 2026/Kind Words Activity/IMG_9074.JPG",
+      "event": "kind-words",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.5],
+      "alt": {
+        "en": "Kind words written in coloured markers inside a traced outline",
+        "fr": "Des mots gentils écrits aux feutres de couleur à l'intérieur d'une silhouette",
+        "ar": "كلمات لطيفة مكتوبة بأقلام ملوّنة داخل رسم لحدود جسم",
+        "tr": "Çizilmiş bir silüetin içine renkli kalemlerle yazılmış nazik sözler"
+      }
+    },
+    {
+      "id": "model-oic",
+      "src": "imstSM2526/Social Media 2025 - 2026/Model OIC 2025 in Istanbul/WhatsApp Image 2025-12-04 at 10.11.22 AM.jpeg",
+      "event": "model-oic",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.6],
+      "alt": {
+        "en": "Delegate desks with flags and name cards at the Model OIC summit in Istanbul",
+        "fr": "Pupitres de délégués avec drapeaux et chevalets au sommet Model OIC à Istanbul",
+        "ar": "طاولات الوفود بالأعلام وبطاقات الأسماء في قمة محاكاة منظمة التعاون الإسلامي في إسطنبول",
+        "tr": "İstanbul'daki Model İİT zirvesinde bayraklı ve isimlikli delege masaları"
+      }
+    },
+    {
+      "id": "traditional-day-ebru",
+      "src": "imstSM2526/Social Media 2025 - 2026/Traditional Day 2026/7.JPG",
+      "event": "traditional-day",
+      "consent": "adults",
+      "focus": [0.55, 0.55],
+      "alt": {
+        "en": "Two women make ebru marbling at a workshop stand on Traditional Day",
+        "fr": "Deux femmes font de l'ebru à un stand d'atelier lors de la Journée traditionnelle",
+        "ar": "سيدتان تمارسان فن الإيبرو في ورشة خلال اليوم التقليدي",
+        "tr": "Geleneksel Gün'de bir atölye standında ebru yapan iki kadın"
+      }
+    },
+    {
+      "id": "maarif-talks",
+      "src": "imstSM2526/Social Media 2025 - 2026/Maarif Talks/20260508_103709527_iOS.heic",
+      "event": "maarif-talks",
+      "consent": "non-identifiable",
+      "crop": { "left": 0.3, "top": 0, "width": 0.7, "height": 1 },
+      "focus": [0.45, 0.5],
+      "alt": {
+        "en": "The Maarif Talks logo on the big screen of the auditorium stage",
+        "fr": "Le logo Maarif Talks sur le grand écran de la scène de l'auditorium",
+        "ar": "شعار Maarif Talks على الشاشة الكبيرة في مسرح القاعة",
+        "tr": "Konferans salonu sahnesindeki büyük ekranda Maarif Talks logosu"
+      }
+    },
+    {
+      "id": "end-of-year-stage",
+      "src": "imstSM2526/Social Media 2025 - 2026/End of Year Ceremony/Photos/Selection/47.JPG",
+      "event": "end-of-year",
+      "consent": "non-identifiable",
+      "focus": [0.45, 0.5],
+      "alt": {
+        "en": "Pupils perform on the auditorium stage at the end-of-year ceremony, seen from the back of the hall",
+        "fr": "Des élèves sur la scène de l'auditorium lors de la cérémonie de fin d'année, vus du fond de la salle",
+        "ar": "تلاميذ يقدّمون عرضًا على مسرح القاعة في حفل نهاية السنة، من آخر القاعة",
+        "tr": "Yıl sonu töreninde sahnede gösteri yapan öğrenciler, salonun arkasından"
+      }
+    },
+    {
+      "id": "pink-day-staff",
+      "src": "imstSM2627/Social Media 2026 - 2027/Pink Day/20261013_115420000_iOS.jpg",
+      "event": "pink-day",
+      "consent": "adults",
+      "focus": [0.5, 0.55],
+      "alt": {
+        "en": "Teachers dressed in pink in front of the Kindergarten building for Pink Day",
+        "fr": "Des enseignantes habillées en rose devant le bâtiment de la maternelle pour la Journée rose",
+        "ar": "معلمات بملابس وردية أمام مبنى الروضة في اليوم الوردي",
+        "tr": "Pembe Gün için anaokulu binasının önünde pembe giyinmiş öğretmenler"
+      }
+    },
+    {
+      "id": "microscope-from-above",
+      "src": "imstSM2526/Social Media 2025 - 2026/Microscope Experiment/IMG_9120.JPG",
+      "event": "microscope",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.6],
+      "alt": {
+        "en": "Seen from above, a pupil looks into a microscope and turns the focus knob",
+        "fr": "Vu d'en haut, un élève regarde dans un microscope et tourne la molette de mise au point",
+        "ar": "من الأعلى، تلميذ ينظر في المجهر ويدير مقبض الضبط",
+        "tr": "Yukarıdan görünüm: mikroskoba bakan ve odak düğmesini çeviren bir öğrenci"
+      }
+    },
+    {
+      "id": "kind-words-outline",
+      "src": "imstSM2526/Social Media 2025 - 2026/Kind Words Activity/IMG_9067.JPG",
+      "event": "kind-words",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.5],
+      "alt": {
+        "en": "Markers lying on a traced body outline filled with kind words",
+        "fr": "Des feutres posés sur une silhouette remplie de mots gentils",
+        "ar": "أقلام ملوّنة على رسم لحدود جسم مليء بالكلمات اللطيفة",
+        "tr": "Nazik sözlerle dolu bir silüetin üzerinde duran kalemler"
+      }
+    },
+    {
+      "id": "pink-day-class",
+      "src": "imstSM2627/Social Media 2026 - 2027/Pink Day/20261013_115450000_iOS.jpg",
+      "event": "pink-day",
+      "consent": "non-identifiable",
+      "focus": [0.5, 0.45],
+      "alt": {
+        "en": "A teacher presents on screen to a Kindergarten class, seen from behind the children",
+        "fr": "Une enseignante présente à l'écran devant une classe de maternelle, vue de derrière les enfants",
+        "ar": "معلّمة تقدّم عرضًا على الشاشة لقسم في الروضة، من خلف الأطفال",
+        "tr": "Bir öğretmen anaokulu sınıfına ekranda sunum yapıyor, çocukların arkasından görünüm"
+      }
+    },
+    {
+      "id": "traditional-day-guests",
+      "src": "imstSM2526/Social Media 2025 - 2026/Traditional Day 2026/17.JPG",
+      "event": "traditional-day",
+      "consent": "adults",
+      "focus": [0.5, 0.55],
+      "alt": {
+        "en": "Guests stand under Tunisian, Maarif and Turkish banners in the school garden on Traditional Day",
+        "fr": "Des invités sous les bannières tunisienne, Maarif et turque dans le jardin de l'école lors de la Journée traditionnelle",
+        "ar": "ضيوف تحت الرايات التونسية ورايات المعارف والتركية في حديقة المدرسة خلال اليوم التقليدي",
+        "tr": "Geleneksel Gün'de okul bahçesinde Tunus, Maarif ve Türk bayrakları altında duran konuklar"
+      }
+    }
+  ],
+  "hero": ["microscope-hands", "ebru-hands", "archery-targets", "tracing-hands", "graduation-plaque", "kindergarten-classroom", "farm-pond"]
+}

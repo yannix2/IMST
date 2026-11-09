@@ -12,13 +12,16 @@ import { SiteFooter } from "@/components/landing/site-footer";
 import { SiteHeader } from "@/components/landing/site-header";
 import { StickyHeader } from "@/components/landing/sticky-header";
 import { PageHero } from "./page-hero";
+import { PhotoBand } from "./photo-band";
 
 // Every inner page: the header, the page hero, the page's own sections, the other pages of
 // its area, and the closing next step (a visit, or WhatsApp with the page already named).
 
-type Props = React.ComponentProps<typeof PageHero> & { body: React.ReactNode };
+// `band`: the page's row of photos (photo-band.tsx) after its sections; false when the page
+// places <PhotoBand> itself.
+type Props = React.ComponentProps<typeof PageHero> & { body: React.ReactNode; band?: boolean };
 
-export function PageShell({ body, ...hero }: Props) {
+export function PageShell({ body, band = true, ...hero }: Props) {
   const { locale, page } = hero;
   const t = messages[locale];
   const path = pathOf(page);
@@ -39,6 +42,7 @@ export function PageShell({ body, ...hero }: Props) {
       <main id="main" tabIndex={-1} className="outline-none">
         <PageHero {...hero} />
         {body}
+        {band ? <PhotoBand locale={locale} page={page} /> : null}
         <SectionPages locale={locale} page={page} />
         <NextStep locale={locale} page={page} />
       </main>

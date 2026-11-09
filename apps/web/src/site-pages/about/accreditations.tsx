@@ -9,7 +9,7 @@ import { aboutFigure } from "../figures";
 
 // The school's recognitions (facts.ts: owner's list of 2026-11-05), described only with what
 // the school's own old Accreditation and Cambridge English pages state, and the Foundation's
-// published 64 countries. [PROPOSAL] Wording to confirm; certificates and the Cambridge centre
+// published 66 countries. [PROPOSAL] Wording to confirm; certificates and the Cambridge centre
 // number to provide (the number appears from maarifcms once entered). The Cambridge English
 // exam list comes from the old site and must be confirmed before launch.
 
@@ -29,7 +29,7 @@ const copy: Record<Locale, Copy> = {
     bodies: [
       { title: "Cambridge International", text: "The school follows the Cambridge International curriculum from Early Years to A Level. Cambridge qualifications are recognised by universities and employers around the world." },
       { title: "Tunisian Ministry of Education", text: "The school works within the rules of the Tunisian Ministry of Education." },
-      { title: "Türkiye Maarif Foundation", text: "The school belongs to the Türkiye Maarif Foundation’s network, which runs schools in 64 countries." },
+      { title: "Türkiye Maarif Foundation", text: "The school belongs to the Türkiye Maarif Foundation’s network, which runs schools in 66 countries." },
     ],
     examsTitle: "Cambridge English exams",
     examsLede: "Children can sit Cambridge English exams for young learners and schools at the school.",
@@ -47,7 +47,7 @@ const copy: Record<Locale, Copy> = {
     bodies: [
       { title: "Cambridge International", text: "L’école suit le programme Cambridge International des Early Years aux A Levels. Les diplômes Cambridge sont reconnus par les universités et les employeurs du monde entier." },
       { title: "Ministère tunisien de l’Éducation", text: "L’école exerce dans le cadre des règles du ministère tunisien de l’Éducation." },
-      { title: "Fondation Maarif de Türkiye", text: "L’école fait partie du réseau de la Fondation Maarif de Türkiye, présent dans 64 pays." },
+      { title: "Fondation Maarif de Türkiye", text: "L’école fait partie du réseau de la Fondation Maarif de Türkiye, présent dans 66 pays." },
     ],
     examsTitle: "Examens Cambridge English",
     examsLede: "Les enfants peuvent passer à l’école les examens Cambridge English pour jeunes apprenants et pour scolaires.",
@@ -65,7 +65,7 @@ const copy: Record<Locale, Copy> = {
     bodies: [
       { title: "Cambridge International", text: "تتبع المدرسة منهاج Cambridge International من Early Years إلى A Level. وشهادات كامبريدج معترف بها لدى الجامعات وأصحاب العمل في العالم." },
       { title: "وزارة التربية التونسية", text: "تعمل المدرسة في إطار قواعد وزارة التربية التونسية." },
-      { title: "وقف المعارف التركي", text: "المدرسة جزء من شبكة وقف المعارف التركي، التي تدير مدارس في 64 دولة." },
+      { title: "وقف المعارف التركي", text: "المدرسة جزء من شبكة وقف المعارف التركي، التي تدير مدارس في 66 دولة." },
     ],
     examsTitle: "امتحانات Cambridge English",
     examsLede: "يمكن للأطفال اجتياز امتحانات Cambridge English للمتعلّمين الصغار وللتلاميذ في المدرسة.",
@@ -83,7 +83,7 @@ const copy: Record<Locale, Copy> = {
     bodies: [
       { title: "Cambridge International", text: "Okul, Early Years’ten A Level’a Cambridge International müfredatını izler. Cambridge belgeleri dünyanın dört bir yanındaki üniversiteler ve işverenlerce tanınır." },
       { title: "Tunus Eğitim Bakanlığı", text: "Okul, Tunus Eğitim Bakanlığı’nın kuralları çerçevesinde çalışır." },
-      { title: "Türkiye Maarif Vakfı", text: "Okul, 64 ülkede okulları bulunan Türkiye Maarif Vakfı ağının bir parçasıdır." },
+      { title: "Türkiye Maarif Vakfı", text: "Okul, 66 ülkede okulları bulunan Türkiye Maarif Vakfı ağının bir parçasıdır." },
     ],
     examsTitle: "Cambridge English sınavları",
     examsLede: "Çocuklar küçük öğrenciler ve okullar için Cambridge English sınavlarına okulda girebilir.",

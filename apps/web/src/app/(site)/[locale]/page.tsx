@@ -7,12 +7,16 @@ import { localizedUrl, siteUrl } from "@/lib/site";
 import { Admissions } from "@/components/landing/admissions";
 import { Campuses } from "@/components/landing/campuses";
 import { FinalCta } from "@/components/landing/final-cta";
-import { LazyFaq, LazyGallery, LazyHeadMessage, LazyNews, LazyTestimonials, LazyTodaysMenu } from "@/components/landing/lazy-sections";
+import { LazyFaq, LazyHeadMessage, LazyNews, LazyTestimonials, LazyTodaysMenu } from "@/components/landing/lazy-sections";
+import { Life } from "@/components/landing/life";
+import { Cambridge } from "@/components/landing/cambridge";
+import { Foundation } from "@/components/landing/foundation";
+import { Journey } from "@/components/landing/journey";
 import { LevelsBand } from "@/components/landing/levels-band";
 import { StickyHeader } from "@/components/landing/sticky-header";
 import { RememberLocale } from "@/components/landing/remember-locale";
 import { StickyCta } from "@/components/landing/sticky-cta";
-import { Hero } from "@/components/landing/hero";
+import { Hero, HeroProof } from "@/components/landing/hero";
 import { Reasons } from "@/components/landing/reasons";
 import { SiteFooter } from "@/components/landing/site-footer";
 import { SiteHeader } from "@/components/landing/site-header";
@@ -74,21 +78,26 @@ export default async function HomePage({ params }: Props) {
         </div>
       </StickyHeader>
       <main id="main" tabIndex={-1} className="outline-none">
-        {/* The first section sits on the page ground: white in light, night navy in dark. */}
+        {/* The film fills the first screen edge to edge; figures and levels follow on the page ground. */}
+        <Hero locale={locale} />
         <div className="mx-auto max-w-[var(--content-max)] px-[var(--gutter)]">
-          <Hero locale={locale} />
+          <HeroProof locale={locale} />
           <LevelsBand locale={locale} />
         </div>
-        {/* Sections staff fill in maarifcms stay absent until something is published. */}
+        {/* Order: docs/plans/2026-11-06-wave-2.md, "New Home order". Sections staff fill in
+            maarifcms stay absent until something is published. */}
         <Reasons locale={locale} />
+        <Cambridge locale={locale} />
         <LazyHeadMessage locale={locale} />
+        <Life locale={locale} />
+        <Journey locale={locale} />
+        <Foundation locale={locale} />
         <Admissions locale={locale} />
-        <LazyGallery locale={locale} />
         <LazyTestimonials locale={locale} />
         <LazyNews locale={locale} />
         <LazyFaq locale={locale} />
         <FinalCta locale={locale} />
-        <Campuses locale={locale} />
+        <Campuses locale={locale} showGlobe={false} />
         <LazyTodaysMenu locale={locale} />
       </main>
       <SiteFooter locale={locale} />

@@ -88,7 +88,7 @@ export function Reasons({ locale }: { locale: Locale }) {
     </p>,
     <ul key="s" className="flex flex-wrap gap-2">
       {x.activities.map((name) => (
-        <li key={name} className="rounded-full bg-navy px-4 py-2 font-medium text-white">
+        <li key={name} className="rounded-full bg-turquoise px-4 py-2 font-medium text-on-turquoise">
           {name}
         </li>
       ))}
@@ -96,7 +96,7 @@ export function Reasons({ locale }: { locale: Locale }) {
   ];
 
   return (
-    <section aria-labelledby="reasons-title" className="bg-mist py-[var(--section-pad)]">
+    <section aria-labelledby="reasons-title" className="bg-turquoise-wash py-[var(--section-pad)]">
       <div className="mx-auto max-w-[var(--content-max)] px-[var(--gutter)]">
         <h2 id="reasons-title" className="max-w-[24ch] text-[length:var(--text-headline)] leading-[var(--leading-headline)] font-bold text-balance text-heading">
           {t.reasons.title}

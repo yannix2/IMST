@@ -18,18 +18,18 @@ import {
   type WeekMenu,
 } from "@maarif/contracts";
 import type { Env } from "./env";
+import { cmsFetch } from "./cms-fetch";
 
 // Public content, read from maarifcms over the service binding with the gateway's API key
 // (read rights on published content only). Every reader returns null when there is nothing
 // to show, so the route answers 404 and the site keeps the section hidden.
 
-const CMS_ORIGIN = "https://maarif-cms.internal";
 // Menus are often typed in one language only; French is the school's working language.
 const MENU_FALLBACK: Locale = "fr";
 
-async function cmsGet<T>(env: Env, path: string): Promise<T | null> {
+export async function cmsGet<T>(env: Env, path: string): Promise<T | null> {
   try {
-    const response = await env.CMS.fetch(`${CMS_ORIGIN}${path}`, {
+    const response = await cmsFetch(env, path, {
       headers: { accept: "application/json", authorization: `api-clients API-Key ${env.CMS_API_KEY}` },
     });
     return response.ok ? ((await response.json()) as T) : null;
@@ -113,7 +113,7 @@ export async function proxyMedia(env: Env, filename: string, range: string | und
   if (range) headers.range = range;
   let upstream: Response;
   try {
-    upstream = await env.CMS.fetch(`${CMS_ORIGIN}/cms-api/media/file/${encodeURIComponent(filename)}`, { headers });
+    upstream = await cmsFetch(env, `/cms-api/media/file/${encodeURIComponent(filename)}`, { headers });
   } catch {
     return Response.json({ ok: false, error: "unavailable" }, { status: 503 });
   }
@@ -127,6 +127,49 @@ export async function proxyMedia(env: Env, filename: string, range: string | und
   }
   out.set("cache-control", "public, max-age=86400");
   return new Response(upstream.body, { status: upstream.status, headers: out });
+}
+
+// Resized images (wave 3, ADR 008): ?w=480|960|1600&f=avif|webp|jpeg on an image goes through
+// the Cloudflare Images binding; the result is kept in the edge cache for a year (file names are
+// unique per upload, so a replaced photo gets a new address). Anything else (video, PDF, no size
+// asked, transformation unavailable) is the original file, as before.
+const widths = new Set([480, 960, 1600]);
+const formats = { avif: "image/avif", webp: "image/webp", jpeg: "image/jpeg" } as const;
+
+export async function serveMedia(
+  env: Env,
+  request: Request,
+  filename: string,
+  options: { width?: string; format?: string; range?: string },
+  waitUntil: (p: Promise<unknown>) => void = () => {},
+): Promise<Response> {
+  const width = Number(options.width);
+  const format = options.format && options.format in formats ? (options.format as keyof typeof formats) : "webp";
+  if (!widths.has(width) || !env.IMAGES) return proxyMedia(env, filename, options.range);
+
+  const cache = (globalThis as { caches?: { default?: Cache } }).caches?.default;
+  const key = new Request(new URL(`/api/media/${encodeURIComponent(filename)}?w=${width}&f=${format}`, request.url).toString());
+  const hit = await cache?.match(key);
+  // A cached response's headers are immutable; copy it so the security headers can be added.
+  if (hit) return new Response(hit.body, hit);
+
+  const original = await proxyMedia(env, filename, undefined);
+  const type = original.headers.get("content-type") ?? "";
+  if (!original.ok || !original.body || !type.startsWith("image/") || type === "image/svg+xml") return original;
+  try {
+    const result = await env.IMAGES.input(original.body)
+      .transform({ width, fit: "scale-down" })
+      .output({ format: formats[format], quality: format === "avif" ? 55 : 76 });
+    // Read the resized image once (a few dozen KB), then serve one copy and cache another: a
+    // cloned stream can arrive broken in the cache.
+    const bytes = await result.response().arrayBuffer();
+    const headers = { "content-type": formats[format], "cache-control": "public, max-age=31536000, immutable", vary: "accept" };
+    if (cache) waitUntil(cache.put(key, new Response(bytes, { headers })));
+    return new Response(bytes, { headers });
+  } catch {
+    // Transformation failed (for example the free monthly quota is used up): serve the original.
+    return proxyMedia(env, filename, undefined);
+  }
 }
 
 export function localeParam(value: string | undefined): Locale | null {

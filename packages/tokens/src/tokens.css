@@ -11,9 +11,12 @@
   --navy: #103b65;
   --night: #0b2a47;
 
-  /* Secondary: the Maarif line, only for the next step */
+  /* Turquoise leads (owner decision 2026-11-06): buttons, highlights, icons, active states and
+     wash bands on a white page. Text on turquoise is always night (5.36:1), never white (2.73:1). */
   --turquoise: #00adbb;
-  --turquoise-ink: #00737c; /* the only turquoise allowed as text on light grounds */
+  --turquoise-ink: #00737c; /* the only turquoise allowed as text on light grounds (5.08:1 on the wash) */
+  --turquoise-wash: #e6f7f8; /* light band behind sections; ink 14.8:1, slate 6.5:1 */
+  --on-turquoise: var(--night);
 
   /* Tertiary: level lines (always labelled) and notices */
   --level-kindergarten: #f2b705;
@@ -105,6 +108,7 @@
   --rule: #2a4560;
   --heading: #f1f6fa;
   --turquoise-ink: #3fcbd6; /* turquoise as text on dark grounds */
+  --turquoise-wash: #0a2f3b; /* deep teal band; ink 12.1:1, slate 7.3:1, turquoise ink 7.2:1 */
 
   --depth-rest: 0 1px 2px rgb(0 0 0 / 0.35), 0 12px 30px -14px rgb(0 0 0 / 0.7);
   --depth-rest-hover: 0 2px 4px rgb(0 0 0 / 0.4), 0 20px 42px -16px rgb(0 0 0 / 0.8);

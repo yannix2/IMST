@@ -44,6 +44,11 @@ export const gradeAges: Record<Grade, readonly [number, number]> = {
 export const levels = ["kindergarten", "primary", "secondary"] as const;
 export type Level = (typeof levels)[number];
 
+// The four stages of the level pages (Kindergarten, Primary Years 1-6, Lower Secondary Years 7-9,
+// Upper Secondary Years 10-13), used to tag clubs, trips and events in maarifcms (wave 3).
+export const stages = ["kindergarten", "primary", "lower-secondary", "upper-secondary"] as const;
+export type Stage = (typeof stages)[number];
+
 // [UNKNOWN] Grouping follows the Cambridge stages (Primary Years 1-6, Secondary Years 7-13);
 // confirm with the administration before publishing level pages.
 export function levelOfGrade(grade: Grade): Level {
