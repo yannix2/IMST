@@ -154,7 +154,9 @@ export default buildConfig({
     // No silent fallback: a missing translation must stay missing (launch rule).
     fallback: false,
   },
-  upload: { limits: { fileSize: 10 * 1024 * 1024 } },
+  // 30 MB for the Home film (wave 5: full film 720p ≤ 30 MB); every other file keeps 10 MB
+  // (Media's beforeOperation hook, MAX_FILE_BYTES in collections/Media.ts).
+  upload: { limits: { fileSize: 30 * 1024 * 1024 } },
   // Wave 4 (ADR 011): emails through this Worker's Cloudflare Email Service binding (email/adapter.ts).
   email: cloudflareEmailAdapter(() => (cloudflare.env as { EMAIL?: MailBinding }).EMAIL),
   editor: lexicalEditor(),

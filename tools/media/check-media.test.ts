@@ -60,6 +60,29 @@ describe("site photos", () => {
     }
   });
 
+  // Wave 5: the Home film's trailer plan (admissions-film.json). The outputs themselves are checked
+  // against their budgets by admissions-film.mjs, which stops when a file is too large.
+  test("the trailer plan stays inside the film, above the subtitles, before the closing card", () => {
+    const plan = JSON.parse(readFileSync(join(here, "admissions-film.json"), "utf8")) as {
+      source: string;
+      keep: number;
+      shots: { start: number; duration: number; x: number; what: string }[];
+    };
+    expect(plan.source.endsWith(".mp4")).toBe(true);
+    expect(plan.keep).toBeGreaterThan(0.75); // the burned-in subtitles sit in the bottom ~14 %
+    expect(plan.keep).toBeLessThanOrEqual(0.86);
+    const total = plan.shots.reduce((n, s) => n + s.duration, 0);
+    expect(total).toBeGreaterThanOrEqual(15);
+    expect(total).toBeLessThanOrEqual(25);
+    for (const s of plan.shots) {
+      expect(s.duration, s.what).toBeGreaterThanOrEqual(1);
+      expect(s.duration, s.what).toBeLessThanOrEqual(3);
+      expect(s.start + s.duration, s.what).toBeLessThanOrEqual(172.5); // from 2:53 the "enrol now" card
+      expect(s.x >= 0 && s.x <= 1, s.what).toBe(true);
+      expect(s.what.length, "describe each shot").toBeGreaterThan(5);
+    }
+  });
+
   test("published media stay within budget", () => {
     expect(size(publicDir)).toBeLessThanOrEqual(25e6);
     expect(statSync(join(publicDir, "hero", "hero-landscape.mp4")).size).toBeLessThanOrEqual(4e6);

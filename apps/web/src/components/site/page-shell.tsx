@@ -2,7 +2,9 @@ import { ArrowUpRightIcon, CalendarCheckIcon, MessageCircleIcon, PhoneIcon } fro
 import type { Locale } from "@maarif/contracts/locales";
 import { messages } from "@/i18n/messages";
 import { pageNames } from "@/i18n/pages";
+import { tourCopy } from "@/content/tour";
 import { areaOf, menuPages, pathOf, type PageKey } from "@/lib/navigation";
+import { tourHref, tourIndex, tourStops } from "@/lib/tour";
 import { campuses, telHref } from "@/lib/school";
 import { whatsappForPage } from "@/lib/whatsapp";
 import { Button } from "@/components/ui/button";
@@ -13,6 +15,7 @@ import { SiteHeader } from "@/components/landing/site-header";
 import { StickyHeader } from "@/components/landing/sticky-header";
 import { PageHero } from "./page-hero";
 import { PhotoBand } from "./photo-band";
+import { TourGate } from "./tour-gate";
 
 // Every inner page: the header, the page hero, the page's own sections, the other pages of
 // its area, and the closing next step (a visit, or WhatsApp with the page already named).
@@ -48,8 +51,20 @@ export function PageShell({ body, band = true, ...hero }: Props) {
       </main>
       <SiteFooter locale={locale} path={path} />
       <RememberLocale locale={locale} />
+      <Tour locale={locale} page={page} />
     </>
   );
+}
+
+// The guided tour (wave 5): only the six tour pages carry the gate; it shows the bar when the
+// address has ?tour=1 (lib/tour.ts).
+function Tour({ locale, page }: { locale: Locale; page: PageKey }) {
+  const index = tourIndex(page);
+  if (index < 0) return null;
+  const p = pageNames[locale];
+  const stops = tourStops.map((key, i) => ({ href: tourHref(locale, i), title: p.pages[key].title }));
+  const visitHref = page === "admissions/visit" ? "#visit-page" : `/${locale}/admissions/visit`;
+  return <TourGate index={index} stops={stops} visitHref={visitHref} visitLabel={messages[locale].station.bookVisit} copy={tourCopy[locale]} />;
 }
 
 // The other pages of this area as cards, so a parent can keep reading without the menu.

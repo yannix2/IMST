@@ -1,4 +1,4 @@
-# Admin protection, nightly maintenance and email (waves 3 and 4)
+# Admin protection, nightly maintenance, email and the Home film (waves 3 to 5)
 
 For the IT manager. There is no staging copy (owner decision 2026-11-09): the demo domain is the test site until the school's own domain.
 
@@ -109,3 +109,30 @@ Export to spreadsheet).
   `suppressed` = that address bounced before).
 - **Compute > Email Service:** sending volume and bounces. Stay well under 3,000 a month to
   avoid paying extra; a newsletter to 1,000 subscribers is 1,000 emails.
+
+## 4. The Home film (wave 5)
+
+Home opens on the school's film: a silent 20-second loop behind the headline, and "Watch the film
+· 3 min" for the full film with sound. Both live in **maarifcms > Content > Home film**; until a
+reviewer ticks **Show on the website**, the site keeps its built-in photo loop and shows no film
+button. The files are never put in the code (the repository is public and the film shows
+children).
+
+**Make the files** (on the IT manager's computer, originals in `E:\IMST\IMSTMEDIA`):
+
+1. `cd WebsiteApp\tools\media`, then `node admissions-film.mjs --sheet` to see the loop's shots
+   (`%TEMP%\maarif-admissions-film\trailer-shots.jpg`). To change them, edit
+   `admissions-film.json` (start time, length, horizontal centre for phones).
+2. `node admissions-film.mjs` writes the loop (wide ≤ 4 MB, tall ≤ 2.5 MB), its still images,
+   the full film (720p ≤ 28 MB, 480p ≤ 15 MB) and its still image. It stops if a file is too big.
+3. Upload: `$env:CMS_URL="https://cms.yassinekhiari.download"; $env:CMS_EMAIL="..."; $env:CMS_PASSWORD="..."; node upload-to-cms.mjs --film`
+   (a reviewer account; add `--publish` to show it at once). Or upload the files by hand in
+   maarifcms and pick them in Home film.
+
+**Transcripts:** the film has English subtitles burned in. In Home film, switch the language at
+the top of the page and paste "What is said in the film" for each language (one paragraph per
+line). French, Arabic and Turkish visitors see it open under the player.
+
+**A new film later:** put it in IMSTMEDIA, change `source` (and the shots) in
+`admissions-film.json`, run steps 1 to 3, and update the transcripts. maarifcms accepts videos
+up to 30 MB and other files up to 10 MB.

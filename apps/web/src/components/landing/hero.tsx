@@ -1,23 +1,28 @@
-import { BadgeCheckIcon, CalendarCheckIcon, MessageCircleIcon } from "lucide-react";
+import { BadgeCheckIcon, CalendarCheckIcon, CompassIcon } from "lucide-react";
 import Link from "next/link";
 import { localeDirection, locales, type Locale } from "@maarif/contracts/locales";
 import { homeCopy } from "@/content/home/wave2";
+import { filmCopy } from "@/content/tour";
 import { messages } from "@/i18n/messages";
 import { accreditations, facts } from "@/lib/facts";
-import { whatsappHref } from "@/lib/school";
+import { tourHref } from "@/lib/tour";
 import { visitHash } from "@/lib/visit";
 import { Button } from "@/components/ui/button";
 import { getHomeHero } from "@/lib/cms";
 import { CtaSpark } from "./cta-spark";
+import { FilmButton } from "./film-button";
 import { HeroFilm } from "./hero-film";
 import { RollingFigures } from "./rolling-figures";
 
-// First viewport (owner decision 2026-11-06): the school's photo motion film fills the screen
-// under the header, behind a night-navy veil, with the promise in the visitor's language, the
-// other three scripts beneath it like a bilingual street sign (each a link to that language), and
-// the two next steps. The poster is the first paint; the film joins after load (hero-film.tsx).
-// The section's height is fixed by the viewport, so nothing moves when the film arrives.
-// White on the veil stays at 5.6:1 or more where the text sits, on the brightest frame.
+// First viewport (owner decision 2026-11-06): the school's film fills the screen under the header,
+// behind a night-navy veil, with the promise in the visitor's language, the other three scripts
+// beneath it like a bilingual street sign (each a link to that language), and the two next steps.
+// The poster is the first paint; the film joins after load (hero-film.tsx). The section's height
+// is fixed by the viewport, so nothing moves when the film arrives. White on the veil stays at
+// 5.6:1 or more where the text sits, on the brightest frame.
+// Wave 5 (owner 2026-11-10): the loop is the trailer of the school's admissions film, the next
+// steps are Book a visit and Discover our school (the guided tour, lib/tour.ts; WhatsApp stays in
+// the sticky bar), and "Watch the film" opens the full film with sound when maarifcms has it.
 
 // Built-in posters (wave 2). Once maarifcms's "Home film" is published (wave 3), its posters and
 // film replace them, resized by maarif-api.
@@ -29,15 +34,18 @@ const builtInPoster = {
 
 export async function Hero({ locale }: { locale: Locale }) {
   const cms = await getHomeHero(locale);
-  const poster = cms
+  const trailer = cms?.trailer ?? null;
+  const poster = trailer
     ? {
-        landscape: (ext: string) => `${cms.posterLandscape.src}?w=960&f=${ext} 960w, ${cms.posterLandscape.src}?w=1600&f=${ext} 1600w`,
-        portrait: (ext: string) => `${cms.posterPortrait.src}?w=960&f=${ext} 720w`,
-        fallback: `${cms.posterLandscape.src}?w=1600&f=webp`,
+        landscape: (ext: string) => `${trailer.posterLandscape.src}?w=960&f=${ext} 960w, ${trailer.posterLandscape.src}?w=1600&f=${ext} 1600w`,
+        portrait: (ext: string) => `${trailer.posterPortrait.src}?w=960&f=${ext} 720w`,
+        fallback: `${trailer.posterLandscape.src}?w=1600&f=webp`,
       }
     : builtInPoster;
   const t = messages[locale];
   const c = homeCopy[locale];
+  const f = filmCopy[locale];
+  const discover = tourHref(locale, 0);
   const s = t.station;
   const align = localeDirection[locale] === "rtl" ? "right" : "left";
   const others = locales.filter((code) => code !== locale);
@@ -61,7 +69,7 @@ export async function Hero({ locale }: { locale: Locale }) {
             className="size-full object-cover"
           />
         </picture>
-        <HeroFilm playLabel={c.heroFilm.play} pauseLabel={c.heroFilm.pause} sources={cms ? { landscape: cms.landscape, portrait: cms.portrait } : undefined} />
+        <HeroFilm playLabel={c.heroFilm.play} pauseLabel={c.heroFilm.pause} sources={trailer ? { landscape: trailer.landscape, portrait: trailer.portrait } : undefined} />
         {/* The veil: deepest behind the words (start side, and the bottom on phones). */}
         <div aria-hidden="true" className="hero-veil absolute inset-0" />
       </div>
@@ -109,12 +117,15 @@ export async function Hero({ locale }: { locale: Locale }) {
               </Button>
             </CtaSpark>
             <Button asChild size="lg" variant="plate">
-              <a href={whatsappHref(s.whatsappMessage(t.schoolName))} target="_blank" rel="noopener noreferrer">
-                <MessageCircleIcon data-icon="inline-start" />
-                {s.whatsapp}
+              <a href={discover}>
+                <CompassIcon data-icon="inline-start" />
+                {f.discover}
               </a>
             </Button>
           </div>
+          {cms?.film ? (
+            <FilmButton locale={locale} film={cms.film} transcript={cms.transcript} copy={f} visitHref={visitHash} visitLabel={s.bookVisit} discoverHref={discover} />
+          ) : null}
         </div>
       </div>
     </section>

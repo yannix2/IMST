@@ -80,16 +80,34 @@ export async function readPageVisuals(env: Env, locale: Locale): Promise<PageVis
   return out;
 }
 
+// Wave 5: the loop (trailer) and the full film are independent; each needs all of its own files.
+// A video counts only if maarifcms says it is a video (a file whose consent is pending comes back
+// as a bare id and is left out by fileOf).
+const videoOf = (value: Rel) => {
+  const file = fileOf(value);
+  return file && (!file.mimeType || file.mimeType.startsWith("video/")) ? mediaPath(file.filename!) : null;
+};
+
 export async function readHomeHero(env: Env, locale: Locale): Promise<HomeHero | null> {
-  const doc = await cmsGet<{ published?: boolean; filmLandscape?: Rel; filmPortrait?: Rel; posterLandscape?: Rel; posterPortrait?: Rel }>(
-    env,
-    `/cms-api/globals/home-hero?locale=${locale}&fallback-locale=none&depth=1`,
-  );
+  const doc = await cmsGet<{
+    published?: boolean;
+    filmLandscape?: Rel;
+    filmPortrait?: Rel;
+    posterLandscape?: Rel;
+    posterPortrait?: Rel;
+    fullFilm?: Rel;
+    fullFilmSmall?: Rel;
+    fullFilmPoster?: Rel;
+    transcript?: unknown;
+  }>(env, `/cms-api/globals/home-hero?locale=${locale}&fallback-locale=none&depth=1`);
   if (!doc?.published) return null;
-  const landscape = fileOf(doc.filmLandscape), portrait = fileOf(doc.filmPortrait);
+  const landscape = videoOf(doc.filmLandscape), portrait = videoOf(doc.filmPortrait);
   const posterLandscape = photo(doc.posterLandscape), posterPortrait = photo(doc.posterPortrait);
-  if (!landscape || !portrait || !posterLandscape || !posterPortrait) return null;
-  return { landscape: mediaPath(landscape.filename!), portrait: mediaPath(portrait.filename!), posterLandscape, posterPortrait };
+  const trailer = landscape && portrait && posterLandscape && posterPortrait ? { landscape, portrait, posterLandscape, posterPortrait } : null;
+  const src = videoOf(doc.fullFilm), small = videoOf(doc.fullFilmSmall);
+  const film = src && small ? { src, small, poster: photo(doc.fullFilmPoster) } : null;
+  if (!trailer && !film) return null;
+  return { trailer, film, transcript: text(doc.transcript) };
 }
 
 // ---- News and events -------------------------------------------------------------------------

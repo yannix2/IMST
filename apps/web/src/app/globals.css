@@ -229,6 +229,26 @@
   animation: script-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* Guided tour (wave 5, components/site/tour-bar.tsx): the bar rises in; while it is shown the
+   page keeps room at the bottom so the footer's last line is never under it. */
+@keyframes tour-in {
+  from {
+    opacity: 0;
+    translate: 0 1rem;
+  }
+}
+.tour-in {
+  animation: tour-in 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+body.with-tour-bar {
+  padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-in {
+    animation: none;
+  }
+}
+
 /* Hairline icons (wave 2, components/hairline/icon.tsx): the figures' still frames, styled like
    the live stage (kernel.js): plates in the surface colour, edges in the text colour, the lit
    part turquoise, back lines faded. */

@@ -1,0 +1,18 @@
+{
+  "_about": "Home film (wave 5, owner 2026-11-10). Source: the school's admissions film (3:03, burned-in English subtitles; every recognisable child authorised in writing, owner 2026-11-10). The trailer is the silent loop behind the Home headline: shots cut at the editor's own cuts, cropped above the subtitle strip (keep = share of the height kept from the top). x = horizontal centre of the tall (phone) crop, 0 to 1. Outputs are uploaded to maarifcms, never committed.",
+  "source": "International Maarif Schools of Tunisia Admissions Open for the 2026–2027 Academic Year.mp4",
+  "length": 182.6,
+  "keep": 0.85,
+  "shots": [
+    { "start": 0.2, "duration": 2.4, "x": 0.5, "what": "drone over the Le Kram building and its logo" },
+    { "start": 3.1, "duration": 1.7, "x": 0.5, "what": "the school's entrance" },
+    { "start": 107.2, "duration": 1.7, "x": 0.45, "what": "robotics, a robot car on its line" },
+    { "start": 55.1, "duration": 1.7, "x": 0.55, "what": "science lab with a teacher" },
+    { "start": 92.1, "duration": 1.7, "x": 0.5, "what": "kindergarten children on the play mat" },
+    { "start": 112.1, "duration": 1.7, "x": 0.5, "what": "a student holding a robot" },
+    { "start": 140.1, "duration": 2.4, "x": 0.38, "what": "library, a student reading" },
+    { "start": 144.1, "duration": 2.4, "x": 0.5, "what": "drone over the basketball court" },
+    { "start": 147.1, "duration": 1.7, "x": 0.55, "what": "football on the court" },
+    { "start": 166.1, "duration": 2.6, "x": 0.5, "what": "the whole school under the flags" }
+  ]
+}

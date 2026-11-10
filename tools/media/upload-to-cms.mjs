@@ -2,7 +2,7 @@
 // 2026-11-09: every photo lives in maarifcms). Idempotent: a file already uploaded (same `source`)
 // is reused, not duplicated.
 //
-//   CMS_URL=http://localhost:3000 CMS_EMAIL=... CMS_PASSWORD=... node upload-to-cms.mjs [--root E:\IMST\IMSTMEDIA] [--publish]
+//   CMS_URL=http://localhost:3000 CMS_EMAIL=... CMS_PASSWORD=... node upload-to-cms.mjs [--root E:\IMST\IMSTMEDIA] [--publish] [--film]
 //
 // For each photo in media-selection.json: the original is re-encoded at most 2400 px wide (JPEG,
 // no metadata), uploaded with its alt text in four languages, its consent status (non-identifiable
@@ -66,6 +66,37 @@ async function upload({ source, buffer, filename, type, alt, consent, focus }) {
     await api(`/media/${id}?locale=${locale}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ alt: alt[locale] }) });
   }
   return id;
+}
+
+// Wave 5: --film uploads only the Home film made by admissions-film.mjs (trailer loop, posters,
+// full film in two sizes) and fills the "Home film" global with it. Consent: every recognisable
+// child in the film is authorised in writing (owner, 2026-11-10). "Show on the website" changes
+// only with --publish; the transcripts are pasted in maarifcms (one per language).
+if (process.argv.includes("--film")) {
+  const { tmpdir } = await import("node:os");
+  const dir = join(tmpdir(), "maarif-admissions-film");
+  const alt = {
+    trailer: { en: "Moments of school life at International Maarif Schools of Tunisia", fr: "Moments de la vie scolaire aux Écoles Internationales Maarif de Tunisie", ar: "لحظات من الحياة المدرسية في مدارس المعارف الدولية بتونس", tr: "Tunus Uluslararası Maarif Okulları'ndan okul yaşamı anları" },
+    film: { en: "Film: our school in 3 minutes", fr: "Film : notre école en 3 minutes", ar: "فيلم: مدرستنا في 3 دقائق", tr: "Film: 3 dakikada okulumuz" },
+  };
+  const film = {};
+  for (const [key, file, type, text] of [
+    ["filmLandscape", "trailer-landscape.mp4", "video/mp4", alt.trailer],
+    ["filmPortrait", "trailer-portrait.mp4", "video/mp4", alt.trailer],
+    ["posterLandscape", "trailer-poster-landscape.webp", "image/webp", alt.trailer],
+    ["posterPortrait", "trailer-poster-portrait.webp", "image/webp", alt.trailer],
+    ["fullFilm", "film-720.mp4", "video/mp4", alt.film],
+    ["fullFilmSmall", "film-480.mp4", "video/mp4", alt.film],
+    ["fullFilmPoster", "film-poster.webp", "image/webp", alt.film],
+  ]) {
+    const path = join(dir, file);
+    if (!existsSync(path)) throw new Error(`missing ${path}; run admissions-film.mjs first`);
+    film[key] = await upload({ source: `admissions-film/${file}`, buffer: readFileSync(path), filename: file, type, alt: text, consent: "parental-authorization", focus: { x: 50, y: 50 } });
+    console.log(`film  ${key.padEnd(18)} → media ${film[key]}`);
+  }
+  await api("/globals/home-hero", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(publish ? { ...film, published: true } : film) });
+  console.log(`\nHome film ${publish ? "published" : "saved (not shown until a reviewer ticks Show on the website)"}. Paste the transcripts in maarifcms > Content > Home film, one per language.`);
+  process.exit(0);
 }
 
 // 1. Photos: the wave 2 set (media-selection.json) and the wave 3 page photos (page-photos.json).

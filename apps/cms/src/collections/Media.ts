@@ -8,6 +8,11 @@ import { refreshHooks } from '../hooks/revalidate'
 // Cloudflare Images (ADR 008), because Workers cannot run image processing inside the CMS.
 export const consentValues = ['pending', 'no-identifiable-child', 'adults-only', 'parental-authorization'] as const
 
+// Upload ceilings (wave 5): videos up to 30 MB (the Home film; payload.config.ts sets the hard
+// limit), everything else 10 MB as before.
+export const MAX_FILE_BYTES = 10 * 1024 * 1024
+export const MAX_VIDEO_BYTES = 30 * 1024 * 1024
+
 export const Media: CollectionConfig = {
   slug: 'media',
   labels: { singular: 'Photo or file', plural: 'Photos and files' },
@@ -27,6 +32,16 @@ export const Media: CollectionConfig = {
     delete: ({ req }) => hasRole(req, 'reviewer'),
   },
   hooks: {
+    beforeOperation: [
+      ({ operation, req, args }) => {
+        if (operation !== 'create' && operation !== 'update') return args
+        const file = req.file
+        if (!file) return args
+        const limit = file.mimetype?.startsWith('video/') ? MAX_VIDEO_BYTES : MAX_FILE_BYTES
+        if (file.size > limit) throw new APIError(`This file is too large: at most ${limit / 1024 / 1024} MB${limit === MAX_FILE_BYTES ? ' (videos: 30 MB)' : ''}.`, 413)
+        return args
+      },
+    ],
     beforeChange: [
       // Belt and braces with the field access below: only a reviewer can set or change consent,
       // whatever path the change comes from (REST, admin, upload script).

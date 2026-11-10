@@ -1641,6 +1641,13 @@ export interface HomeHero {
   filmPortrait?: (number | null) | Media;
   posterLandscape?: (number | null) | Media;
   posterPortrait?: (number | null) | Media;
+  fullFilm?: (number | null) | Media;
+  fullFilmSmall?: (number | null) | Media;
+  fullFilmPoster?: (number | null) | Media;
+  /**
+   * Shown under the film ("Read what is said"). The film itself has English subtitles; write the words in each language. One paragraph per line break.
+   */
+  transcript?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1781,6 +1788,10 @@ export interface HomeHeroSelect<T extends boolean = true> {
   filmPortrait?: T;
   posterLandscape?: T;
   posterPortrait?: T;
+  fullFilm?: T;
+  fullFilmSmall?: T;
+  fullFilmPoster?: T;
+  transcript?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

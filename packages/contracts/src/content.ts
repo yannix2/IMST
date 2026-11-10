@@ -101,7 +101,16 @@ export type MediaFormat = (typeof mediaFormats)[number];
 export type PageVisual = { header: SitePhoto | null; slots: Record<string, SitePhoto> };
 export type PageVisuals = Record<string, PageVisual>;
 
-export type HomeHero = { landscape: string; portrait: string; posterLandscape: SitePhoto; posterPortrait: SitePhoto };
+/**
+ * Home first screen (wave 5). `trailer`: the silent loop behind the headline (null: the site keeps
+ * its built-in loop). `film`: the full film with sound behind "Watch the film" (`small` for phones;
+ * null: no button). `transcript`: what is said in the film, in the requested language ("" if none).
+ */
+export type HomeHero = {
+  trailer: { landscape: string; portrait: string; posterLandscape: SitePhoto; posterPortrait: SitePhoto } | null;
+  film: { src: string; small: string; poster: SitePhoto | null } | null;
+  transcript: string;
+};
 
 export type NewsSummary = { slug: string; kind: "news" | "event"; title: string; date: string; summary: string; image: SitePhoto | null; stages: string[] };
 export type NewsArticle = NewsSummary & {
