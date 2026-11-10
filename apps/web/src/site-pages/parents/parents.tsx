@@ -221,7 +221,11 @@ export function FeedbackPage({ locale }: { locale: Locale }) {
           <div className="grid gap-10 lg:grid-cols-12">
             <div className="lg:col-span-7">
               <p className="mb-6 max-w-[60ch] text-lg text-ink">{f.intro}</p>
-              <FeedbackForm locale={locale} />
+              {/* Only this language's form texts travel to the browser (Home-style JS budget). */}
+              <FeedbackForm
+                locale={locale}
+                copy={{ kind: f.kind, kinds: f.kinds, name: f.name, phone: f.phone, email: f.email, oneWay: f.oneWay, grade: f.grade, gradeNone: f.gradeNone, message: f.message, consent: f.consent, send: f.send, sent: f.sent("{ref}") }}
+              />
             </div>
             <aside className="lg:col-span-5">
               <h2 className="font-heading text-2xl font-bold text-heading">{f.procedureTitle}</h2>

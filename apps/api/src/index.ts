@@ -24,9 +24,10 @@ import {
   readTrips,
 } from "./content-wave3";
 import type { Env } from "./env";
-import { notifyStaff } from "./notify";
+import { confirmToSender, notifyStaff } from "./notify";
 import { revalidate } from "./revalidate";
-import { nightly } from "./scheduled";
+import { newsletterRoutes } from "./newsletter";
+import { NEWSLETTER_CRON, newsletterBatch, nightly } from "./scheduled";
 import { verifyTurnstile } from "./turnstile";
 
 const MAX_FORM_BYTES = 16 * 1024;
@@ -95,7 +96,7 @@ app.post(
     else if (cv.type !== cvRules.mimeType || !(await isPdf(cv))) errors.cv = "pdf_only";
     if (!parsed.success || Object.keys(errors).length) return c.json<FormResult>({ ok: false, error: "invalid", fields: errors }, 422);
 
-    const human = await verifyTurnstile(parsed.data.turnstileToken, c.env.TURNSTILE_SECRET, ip);
+    const human = await verifyTurnstile(parsed.data.turnstileToken, c.env.TURNSTILE_SECRET, ip, c.env.SITE_URL);
     if (!human) return c.json<FormResult>({ ok: false, error: "captcha" }, 403);
 
     let jobId: string | null = null;
@@ -107,9 +108,13 @@ app.post(
     const reference = await createApplication(c.env, parsed.data, jobId, cv as File);
     if (!reference) return c.json<FormResult>({ ok: false, error: "unavailable" }, 503);
     later(c, notifyStaff(c.env, "application", reference, c.env.ADMIN_URL ?? DEFAULT_ADMIN_URL));
+    later(c, confirmToSender(c.env, "application", parsed.data, reference));
     return c.json<FormResult>({ ok: true, reference }, 201);
   },
 );
+
+// Newsletter sign-up, confirm and unsubscribe (wave 4). Registered before /api/forms/:kind.
+newsletterRoutes(app);
 
 // A real PDF starts with "%PDF-"; the browser's type alone is not trusted.
 async function isPdf(file: File): Promise<boolean> {
@@ -150,13 +155,14 @@ app.post(
       return c.json<FormResult>({ ok: false, error: "invalid", fields: fieldErrors(parsed.error) }, 422);
     }
 
-    const human = await verifyTurnstile(parsed.data.turnstileToken, c.env.TURNSTILE_SECRET, ip);
+    const human = await verifyTurnstile(parsed.data.turnstileToken, c.env.TURNSTILE_SECRET, ip, c.env.SITE_URL);
     if (!human) return c.json<FormResult>({ ok: false, error: "captcha" }, 403);
 
     const reference = await createInquiry(c.env, kind, parsed.data);
     if (!reference) return c.json<FormResult>({ ok: false, error: "unavailable" }, 503);
 
     later(c, notifyStaff(c.env, kind, reference, c.env.ADMIN_URL ?? DEFAULT_ADMIN_URL));
+    later(c, confirmToSender(c.env, kind, parsed.data, reference));
     return c.json<FormResult>({ ok: true, reference }, 201);
   },
 );
@@ -288,10 +294,11 @@ app.post("/internal/revalidate", async (c) => {
 app.onError((_error, c) => c.json({ ok: false, error: "unavailable" }, 500));
 app.notFound((c) => c.json({ ok: false, error: "not_found" }, 404));
 
-// Workers entry: HTTP requests, plus the nightly cron (wrangler.jsonc) for retention and backup.
+// Workers entry: HTTP requests, plus two crons (wrangler.jsonc): nightly retention and backup, and
+// every five minutes the newsletter sender.
 export default {
   fetch: app.fetch,
-  scheduled: (_event: ScheduledController, env: Env, ctx: ExecutionContext) => {
-    ctx.waitUntil(nightly(env));
+  scheduled: (event: ScheduledController, env: Env, ctx: ExecutionContext) => {
+    ctx.waitUntil(event.cron === NEWSLETTER_CRON ? newsletterBatch(env) : nightly(env));
   },
 };

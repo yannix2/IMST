@@ -7,6 +7,7 @@ apps/web        Next.js public site       → Worker maarif-web  (no data bindin
 apps/api        Hono API, the single door → Worker maarif-api  (forms, media, internal reads)
 apps/cms        maarifcms: Payload 3      → Worker maarif-cms  (the only Worker bound to D1)
 packages/contracts   shared zod schemas and types (locales, grades, forms)
+packages/mail        every email: Email Service wrapper, branded layout, templates (wave 4, ADR 011)
 packages/tokens      design tokens from DESIGN.md
 ```
 
@@ -33,12 +34,14 @@ Copy-Item apps/api/.dev.vars.example apps/api/.dev.vars   # then edit values
 | All tests | `pnpm test` |
 | All typechecks | `pnpm typecheck` |
 | Contract tests | `pnpm --filter @maarif/contracts test` |
+| Mail template tests | `pnpm --filter @maarif/mail test` |
 | API tests | `pnpm --filter @maarif/api test` |
 | CMS access-control tests (local D1) | `pnpm --filter @maarif/cms test:int` |
 | One test file | `pnpm --filter @maarif/api exec vitest run src/index.test.ts` |
 | Run the CMS locally | `pnpm --filter @maarif/cms dev` → http://localhost:3000/admin |
 | Run the site locally | `pnpm --filter @maarif/web dev` |
 | Run the API locally | `pnpm --filter @maarif/api dev` |
+| Test forms on a local production build | set `NEXT_PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA` in the shell before `next build` (it wins over the real key in `.env.production`, which only works on the site's hostnames; when the check cannot run, forms show phone and WhatsApp) |
 | After changing CMS collections | `pnpm --filter @maarif/cms generate:types` then `pnpm --filter @maarif/cms payload migrate:create <name>` |
 
 ## Cloudflare resources

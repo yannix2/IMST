@@ -54,7 +54,8 @@ export async function PageHero({ locale, page, lede, figure, children, title, ph
           >
             {title ?? name.title}
           </h1>
-          <p className="mt-5 max-w-[56ch] text-lg text-slate sm:text-xl">{lede ?? name.blurb}</p>
+          {/* Arabic: em, not ch (1ch = 0.5em while Readex Pro loads, 0.602em after: the lede rewrapped, wave 4 D1). */}
+          <p className="mt-5 max-w-[56ch] rtl:max-w-[33.75em] text-lg text-slate sm:text-xl">{lede ?? name.blurb}</p>
           {children ? <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">{children}</div> : null}
         </div>
         {header ? (

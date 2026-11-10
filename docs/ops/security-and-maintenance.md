@@ -1,4 +1,4 @@
-# Admin protection and nightly maintenance (wave 3, B7)
+# Admin protection, nightly maintenance and email (waves 3 and 4)
 
 For the IT manager. There is no staging copy (owner decision 2026-11-09): the demo domain is the test site until the school's own domain.
 
@@ -8,13 +8,15 @@ maarifcms already refuses passwords under 12 characters, locks an account after 
 for 15 minutes (Payload `maxLoginAttempts` / `lockTime`), and logs every change in the Audit log.
 Add one Cloudflare rule on top, in the dashboard of the domain:
 
-1. **Security > WAF > Rate limiting rules > Create rule.**
+1. **Security > WAF > Rate limiting rules > Create rule** (done by the owner, 2026-11-10).
    - Name: `maarifcms login`.
-   - If incoming requests match: Hostname equals `cms.yassinekhiari.download` **and** URI Path
-     equals `/cms-api/users/login` **and** Request Method equals `POST`.
-   - Rate: 5 requests per 1 minute, counted by IP.
-   - Then: Block for 10 minutes (the free plan allows one rate-limiting rule; this is the one).
-2. **Security > WAF > Custom rules > Create rule** (optional, if staff only log in from Tunisia):
+   - If incoming requests match: URI Path equals `/cms-api/users/login` (only maarifcms serves
+     `/cms-api`, so no hostname is needed; adding Request Method `POST` is optional).
+   - Rate: 5 requests per 10 seconds, counted by IP (with data centre, Cloudflare's default).
+   - Then: Block for 10 seconds. The free plan allows one rate-limiting rule and only these
+     10-second periods; the longer lockout comes from maarifcms itself (5 failed tries = 15
+     minutes locked, above).
+2. **Security > WAF > Custom rules > Create rule** (enabled by the owner, 2026-11-10; for staff who only log in from Tunisia):
    - Hostname equals `cms.yassinekhiari.download` **and** Country is not `Tunisia`.
    - Action: Managed Challenge (not Block, so a staff member travelling can still get in).
 3. **Security > Bots:** turn on Bot Fight Mode.
@@ -22,6 +24,10 @@ Add one Cloudflare rule on top, in the dashboard of the domain:
 
 The public forms are already limited inside maarif-api (5 per minute per form and IP) and
 protected by Turnstile; the deploy refuses the test Turnstile key once `LAUNCHED` is `true`.
+Switching to a real Turnstile widget: first deploy the real **site key** (public, in
+`apps/web/.env.production`) while maarif-api still has the always-pass test secret, then set the
+real secret with `npx.cmd wrangler secret put TURNSTILE_SECRET --name maarif-api`. The other order
+breaks the forms in between (a real secret refuses the test widget's tokens).
 
 ## 2. Nightly maintenance (03:00 Tunis time)
 
@@ -40,4 +46,66 @@ D1 Time Travel (30 days, automatic) stays as the second safety net:
 `wrangler d1 time-travel restore maarif-db --timestamp=<ISO time>`.
 
 To check the job ran: Workers > maarif-api > Logs, filter on `nightly`; or list the bucket's
-`backups/` folder.
+`backups/` folder. Since wave 4 it also deletes newsletter sign-ups never confirmed within 30 days.
+
+## 3. Email (wave 4, ADR 011)
+
+Every email leaves through **Cloudflare Email Service** (the `EMAIL` binding of maarif-api and
+maarifcms). It needs the account on **Workers Paid** ($5 a month): 3,000 emails a month are
+included, then $0.35 per 1,000. Email Sending is still in beta; Cloudflare publishes no hard
+limits, so the newsletter sender stops on a rate or daily limit and resumes five minutes later.
+
+| Email | Sent by | From | Replies go to |
+|---|---|---|---|
+| Confirmation after a form (visit, pre-registration, contact, feedback, application) | maarif-api | `noreply@` | `contact@` |
+| "New entry" to staff (no personal details, a link to maarifcms) | maarif-api | `noreply@` | `contact@` |
+| "Your visit is confirmed" (admissions tick the box on the visit request) | maarifcms | `noreply@` | `contact@` |
+| maarifcms invitation (72 hours) and password reset (1 hour) | maarifcms | `noreply@` | `support@` |
+| Newsletter sign-up confirmation and the newsletter itself | maarifcms | `info@` | `info@` |
+| "Newsletter sent" report to staff | maarifcms | `noreply@` | `contact@` |
+
+The domain is the Worker variable `MAIL_DOMAIN` (both `apps/api/wrangler.jsonc` and
+`apps/cms/wrangler.jsonc`), today `yassinekhiari.download`. Moving to the school's domain =
+change it in both files, onboard the new domain (step 2 below), set up its routing (step 3),
+deploy.
+
+Staff recipients come from **maarifcms > Settings > Site settings > Notifications** (admissions,
+general, parents, careers). The newsletter report goes to the "general" list.
+
+### One-time setup in the Cloudflare dashboard
+
+1. **Billing:** upgrade the account to **Workers Paid**.
+2. **Compute > Email Service > Email Sending > Onboard domain:** `yassinekhiari.download`.
+   Cloudflare adds the SPF, DKIM and DMARC records to the zone itself. Wait until the domain
+   shows as verified.
+3. **Email > Email Routing:** enable it on the zone, add the owner's real inbox as a
+   destination address (Cloudflare sends one verification email: click it), then create three
+   routes: `info@`, `contact@`, `support@` → that inbox. `noreply@` gets no route: nobody
+   answers it, and replies already go elsewhere.
+4. Send yourself a test: create a staff account for your own address in maarifcms (you get the
+   invitation), sign up for the newsletter in the site's footer (you get the confirmation), and
+   send a visit request with your email (you get the confirmation; staff in Site settings get
+   the notification).
+
+### Newsletter, for staff
+
+1. **maarifcms > Newsletter > Newsletters > Create:** write the English subject and text first
+   (required), then the other languages. Subscribers get their language, or English when it is
+   missing.
+2. Save, then **Send a test to me** in the sidebar: each language version arrives in your inbox.
+3. Set the status to **Ready to send** and save. A reviewer presses **Send to subscribers**.
+4. Batches of 200 leave every five minutes; the sidebar counts fill in. When it is done the
+   status becomes **Sent** and the "general" staff list gets a short report. Addresses that
+   bounce are unsubscribed automatically.
+
+Only people who signed up on the website and clicked the confirmation link are subscribers;
+nobody can be added by hand. Administrators can export the list (Newsletter subscribers >
+Export to spreadsheet).
+
+### What to watch
+
+- **Workers > maarif-api / maarif-cms > Logs:** `email not sent` warnings carry the error code
+  (`sender_domain` = the domain is not onboarded yet; `daily_limit` / `rate_limit` = wait;
+  `suppressed` = that address bounced before).
+- **Compute > Email Service:** sending volume and bounces. Stay well under 3,000 a month to
+  avoid paying extra; a newsletter to 1,000 subscribers is 1,000 emails.

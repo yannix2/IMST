@@ -89,7 +89,7 @@ export function Foundation({ locale }: { locale: Locale }) {
           </div>
           <p className="mt-8 max-w-[70ch] text-sm text-on-plate-muted">
             {w.mapNote(maarifCountries.length, foundation.countries)}{" "}
-            <a href="https://turkiyemaarif.org/dunyada-maarif" target="_blank" rel="noopener noreferrer" className="font-bold text-turquoise underline-offset-2 hover:underline">
+            <a href="https://turkiyemaarif.org/dunyada-maarif" target="_blank" rel="noopener noreferrer" className="font-bold text-turquoise-plate underline-offset-2 hover:underline">
               {w.seeAll}
             </a>
           </p>

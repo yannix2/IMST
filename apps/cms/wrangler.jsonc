@@ -39,8 +39,17 @@
   "workers_dev": false,
   "preview_urls": false,
   "routes": [{ "pattern": "cms.yassinekhiari.download", "custom_domain": true }],
-  // SITE_URL: the public site, for the admin's "View on site" buttons (wave 3).
-  "vars": { "PAYLOAD_PUBLIC_SERVER_URL": "https://cms.yassinekhiari.download", "SITE_URL": "https://yassinekhiari.download" },
+  // SITE_URL: the public site, for the admin's "View on site" buttons (wave 3) and links in emails.
+  // MAIL_DOMAIN: emails leave from noreply@ / info@ of this domain (wave 4, packages/mail).
+  "vars": {
+    "PAYLOAD_PUBLIC_SERVER_URL": "https://cms.yassinekhiari.download",
+    "SITE_URL": "https://yassinekhiari.download",
+    "MAIL_DOMAIN": "yassinekhiari.download"
+  },
+
+  // Email (wave 4, ADR 011): Cloudflare Email Service, Workers Paid (any recipient): invitations,
+  // password reset, visit confirmations, newsletter sign-up confirmations and the newsletter itself.
+  "send_email": [{ "name": "EMAIL" }],
 
   // Refresh on publish (wave 3, ADR 007): after staff publish, maarifcms tells maarif-api which
   // pages changed (src/hooks/revalidate.ts). Secrets: REVALIDATE_SECRET (the same as maarif-api's),

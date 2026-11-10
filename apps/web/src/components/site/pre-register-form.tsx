@@ -4,15 +4,16 @@
 // pre-registration, which checks it again, verifies Turnstile and stores it in maarifcms).
 // The same seven fields as the old site's form, with the grade as a list and messages in the
 // visitor's language. The year chosen on the route map is pre-selected.
-import { useEffect, useId, useRef, useState } from "react";
-import { MessageCircleIcon, PhoneIcon } from "lucide-react";
+import { useEffect, useId, useState } from "react";
 import type { FormResult } from "@maarif/contracts/forms";
 import type { Locale } from "@maarif/contracts/locales";
 import { gradesOfLevel, levels, type Grade } from "@maarif/contracts/school";
 import { messages } from "@/i18n/messages";
 import { useRoute, updateRoute } from "@/lib/route-store";
-import { campuses, telHref, whatsappHref } from "@/lib/school";
-import { loadTurnstile, TURNSTILE_SITE_KEY } from "@/lib/turnstile";
+import { useTurnstile } from "@/lib/use-turnstile";
+import dynamic from "next/dynamic";
+// Shown only when sending fails: fetched then, not with the page (JS budget).
+const ReachUs = dynamic(() => import("@/components/site/reach-us").then((m) => m.ReachUs));
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -47,34 +48,11 @@ export function PreRegisterForm({ locale }: { locale: Locale }) {
   const [status, setStatus] = useState<Status>("idle");
   const [reference, setReference] = useState("");
   const [fields, setFields] = useState<Record<string, string>>({});
-  const [token, setToken] = useState("");
-  const captchaRef = useRef<HTMLDivElement>(null);
-  const phone = campuses.schools.phones[0];
+  const { ref: captchaRef, token, failed, reset } = useTurnstile(locale);
 
   useEffect(() => {
     if (route.grade) setGrade(route.grade);
   }, [route.grade]);
-
-  useEffect(() => {
-    let widget: string | undefined;
-    let cancelled = false;
-    loadTurnstile()
-      .then(() => {
-        if (cancelled || !captchaRef.current || !window.turnstile) return;
-        widget = window.turnstile.render(captchaRef.current, {
-          sitekey: TURNSTILE_SITE_KEY,
-          language: locale,
-          theme: document.documentElement.dataset.theme === "dark" ? "dark" : "light",
-          callback: (value: string) => setToken(value),
-          "expired-callback": () => setToken(""),
-        });
-      })
-      .catch(() => setStatus("unavailable"));
-    return () => {
-      cancelled = true;
-      if (widget && window.turnstile) window.turnstile.remove(widget);
-    };
-  }, [locale]);
 
   async function submit(event: { preventDefault(): void; currentTarget: HTMLFormElement }) {
     event.preventDefault();
@@ -109,8 +87,10 @@ export function PreRegisterForm({ locale }: { locale: Locale }) {
         setFields(result.fields);
         return setStatus("invalid");
       }
+      reset();
       setStatus(result.error);
     } catch {
+      reset();
       setStatus("unavailable");
     }
   }
@@ -203,38 +183,20 @@ export function PreRegisterForm({ locale }: { locale: Locale }) {
             <input name="website" tabIndex={-1} autoComplete="off" />
           </label>
         </div>
-        <div ref={captchaRef} className="sm:col-span-2" />
+        {failed ? null : <div ref={captchaRef} className="min-h-[65px] sm:col-span-2" />}
 
         <div className="sm:col-span-2">
-          <Button type="submit" size="lg" disabled={status === "sending"}>
+          <Button type="submit" size="lg" disabled={status === "sending" || failed}>
             {status === "sending" ? <Spinner data-icon="inline-start" /> : null}
             {status === "sending" ? s.sending : w.send}
           </Button>
         </div>
 
-        {status === "invalid" || status === "captcha" || status === "rate_limited" || status === "unavailable" ? (
-          <Alert variant={status === "unavailable" ? "default" : "destructive"} className="sm:col-span-2">
-            <AlertDescription className="text-base">
-              {status === "invalid" ? s.fix : status === "captcha" ? s.captcha : status === "rate_limited" ? s.rateLimited : s.unavailable}
-              {status === "unavailable" ? (
-                <span className="mt-3 flex flex-wrap gap-2">
-                  <Button asChild variant="outline">
-                    <a href={telHref(phone)}>
-                      <PhoneIcon data-icon="inline-start" />
-                      <span className="tabular" dir="ltr">
-                        {phone}
-                      </span>
-                    </a>
-                  </Button>
-                  <Button asChild variant="outline">
-                    <a href={whatsappHref(s.whatsappMessage(t.schoolName))} target="_blank" rel="noopener noreferrer">
-                      <MessageCircleIcon data-icon="inline-start" />
-                      {s.whatsapp}
-                    </a>
-                  </Button>
-                </span>
-              ) : null}
-            </AlertDescription>
+        {status === "unavailable" || failed ? (
+          <ReachUs locale={locale} className="sm:col-span-2" />
+        ) : status === "invalid" || status === "captcha" || status === "rate_limited" ? (
+          <Alert variant="destructive" className="sm:col-span-2">
+            <AlertDescription className="text-base">{status === "invalid" ? s.fix : status === "captcha" ? s.captcha : s.rateLimited}</AlertDescription>
           </Alert>
         ) : null}
       </FieldGroup>

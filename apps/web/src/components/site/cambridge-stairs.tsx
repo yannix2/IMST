@@ -142,7 +142,7 @@ export function CambridgeStairs({ locale }: { locale: Locale }) {
       </div>
 
       <div aria-live="polite" className="plate flex flex-col gap-4 rounded-[var(--radius-plate)] bg-navy p-7 text-white shadow-raised lg:col-span-4">
-        <p className="text-sm font-medium text-turquoise">{stageNames[stageOf(grade)]}</p>
+        <p className="text-sm font-medium text-turquoise-plate">{stageNames[stageOf(grade)]}</p>
         <p className="font-heading text-4xl font-bold">{t.grade(year)}</p>
         <dl className="grid grid-cols-2 gap-3 text-on-plate-muted">
           <div>

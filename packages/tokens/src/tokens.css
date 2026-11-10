@@ -17,6 +17,9 @@
   --turquoise-ink: #00737c; /* the only turquoise allowed as text on light grounds (5.08:1 on the wash) */
   --turquoise-wash: #e6f7f8; /* light band behind sections; ink 14.8:1, slate 6.5:1 */
   --on-turquoise: var(--night);
+  /* Small turquoise text on navy plates (wave 4: #00adbb is only 4.19:1 on navy); 5.84:1 on navy,
+     7.47:1 on night. Icons and large numbers keep --turquoise. Same in both themes. */
+  --turquoise-plate: #3fcbd6;
 
   /* Tertiary: level lines (always labelled) and notices */
   --level-kindergarten: #f2b705;

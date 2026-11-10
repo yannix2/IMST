@@ -4,6 +4,8 @@ import { pageNames } from "@/i18n/pages";
 import { builtAreas, legalPages, menuPages, pathOf } from "@/lib/navigation";
 import { campuses, schoolEmail, telHref } from "@/lib/school";
 import { SocialLinks } from "@/components/site/social-links";
+import { NewsletterSlot } from "@/components/site/newsletter-slot";
+import { newsletterCopy } from "@/content/newsletter";
 import { LanguageTabs } from "./language-tabs";
 
 const cookieSettings: Record<Locale, string> = { en: "Cookie settings", fr: "Réglages des cookies", ar: "إعدادات ملفات تعريف الارتباط", tr: "Çerez ayarları" };
@@ -80,6 +82,17 @@ export function SiteFooter({ locale, path = "" }: { locale: Locale; path?: strin
             </dl>
           </div>
         </nav>
+
+        {/* Wave 4: newsletter sign-up (double opt-in). The form loads near the footer. */}
+        <section aria-labelledby="footer-newsletter" className="grid gap-6 border-t border-white/12 pt-10 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-12">
+          <div className="flex flex-col gap-2">
+            <h2 id="footer-newsletter" className="font-heading text-lg font-bold text-white">
+              {newsletterCopy[locale].heading}
+            </h2>
+            <p className="text-on-plate-muted">{newsletterCopy[locale].text}</p>
+          </div>
+          <NewsletterSlot locale={locale} privacyHref={`/${locale}${pathOf("privacy")}`} privacyLabel={p.pages.privacy.title} />
+        </section>
 
         <div className="flex flex-col gap-4 border-t border-white/12 pt-8 md:flex-row md:items-center md:justify-between">
           <LanguageTabs locale={locale} label={t.footer.languages} path={path} />

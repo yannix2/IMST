@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { app } from "./index";
 import { photo, readDocuments, readJobs, readNewsArticle, readPageVisuals } from "./content-wave3";
-import { mimeMessage } from "./notify";
 import type { Env } from "./env";
 
 function envWith(handler: (url: string, init?: RequestInit) => Response, extra: Partial<Env> = {}) {
@@ -197,9 +196,56 @@ describe("media and notifications", () => {
     expect(fetch.mock.calls[0]![0]).toMatch(/\/cms-api\/media\/file\/photo\.jpg$/);
   });
 
-  it("writes a notification without personal details", () => {
-    const raw = mimeMessage("noreply@school.tn", "staff@school.tn", "New visit request", "Open it in maarifcms.");
-    expect(raw).toMatch(/^From: maarifcms <noreply@school.tn>\r\nTo: <staff@school.tn>/);
-    expect(raw).toContain("Content-Transfer-Encoding: base64");
+});
+
+describe("emails after a form (wave 4)", () => {
+  const settings = { notifications: { admissions: [{ email: "admissions@school.tn" }, { email: "bad" }] } };
+  const visit = { locale: "fr", turnstileToken: "t", privacyNoticeAccepted: true, parentName: "Leila Ben Ali", phone: "+216 22 123 456", email: "leila@example.com", grade: "year-11", preferredDate: nextMonth, preferredSlot: "morning", message: "Mon fils aime la robotique." };
+  const post = (env: Env, body: unknown, kind = "visit-booking") =>
+    app.request(`/api/forms/${kind}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }, env);
+  const cms = (url: string) => (url.includes("site-settings") ? Response.json(settings) : Response.json({ doc: { id: 128 } }, { status: 201 }));
+
+  it("tells staff without personal details and confirms to the parent in French", async () => {
+    const send = vi.fn(async (_m: Record<string, unknown>) => ({ messageId: "m" }));
+    const { env } = envWith(cms, { EMAIL: { send }, MAIL_DOMAIN: "school.tn" });
+    expect((await post(env, visit)).status).toBe(201);
+    await vi.waitFor(() => expect(send).toHaveBeenCalledTimes(2));
+    const mails = send.mock.calls.map((c) => c[0] as { to: string; from: { email: string }; replyTo: string; subject: string; text: string; html: string });
+    const staff = mails.find((m) => m.to === "admissions@school.tn")!;
+    expect(staff.from.email).toBe("noreply@school.tn");
+    expect(staff.subject).toBe("New visit request (#128)");
+    expect(staff.text).toContain("https://cms.yassinekhiari.download/admin/collections/inquiries/128");
+    for (const secret of ["Leila", "leila@example.com", "22 123 456", "robotique"]) expect(staff.text + staff.html).not.toContain(secret);
+    const parent = mails.find((m) => m.to === "leila@example.com")!;
+    expect(parent.replyTo).toBe("contact@school.tn");
+    expect(parent.subject).toBe("Nous avons bien reçu votre demande de visite (128)");
+    expect(parent.text).toContain("Bonjour Leila Ben Ali,");
+    expect(parent.text).toContain("Année 11");
+    expect(parent.text).toContain("Charguia 2");
+    expect(parent.text).not.toContain("robotique");
+  });
+
+  it("sends no confirmation without an email, and nothing at all without the binding", async () => {
+    const send = vi.fn(async () => ({ messageId: "m" }));
+    const { env } = envWith(cms, { EMAIL: { send }, MAIL_DOMAIN: "school.tn" });
+    expect((await post(env, { ...visit, email: "" })).status).toBe(201);
+    await vi.waitFor(() => expect(send).toHaveBeenCalledTimes(1));
+    expect((send.mock.calls[0] as unknown as [{ to: string }])[0].to).toBe("admissions@school.tn");
+    const bare = envWith(cms);
+    expect((await post(bare.env, visit)).status).toBe(201);
+  });
+
+  it("still answers 201 when the email service refuses", async () => {
+    const send = vi.fn(async () => Promise.reject(Object.assign(new Error("E_DAILY_LIMIT_EXCEEDED"), { code: "E_DAILY_LIMIT_EXCEEDED" })));
+    const { env } = envWith(cms, { EMAIL: { send }, MAIL_DOMAIN: "school.tn" });
+    expect((await post(env, visit)).status).toBe(201);
+  });
+
+  it("greets the parent, never the child, after a pre-registration", async () => {
+    const { confirmationData } = await import("./notify");
+    const data = { locale: "en" as const, studentName: "Amira", guardianName: undefined, email: "p@example.com", grade: "kg" };
+    expect(confirmationData("pre-registration", data, "5")).toEqual({ to: "p@example.com", details: { reference: "5", grade: "kg" } });
+    const job = { locale: "tr" as const, name: "Sami", email: "s@example.com", position: "Fen öğretmeni" };
+    expect(confirmationData("application", job, "9").details).toEqual({ reference: "9", name: "Sami", position: "Fen öğretmeni" });
   });
 });

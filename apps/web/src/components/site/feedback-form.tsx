@@ -12,6 +12,9 @@ import type { Locale } from "@maarif/contracts/locales";
 import { gradesOfLevel, levels } from "@maarif/contracts/school";
 import { messages } from "@/i18n/messages";
 import { useTurnstile } from "@/lib/use-turnstile";
+import dynamic from "next/dynamic";
+// Shown only when sending fails: fetched then, not with the page (JS budget).
+const ReachUs = dynamic(() => import("@/components/site/reach-us").then((m) => m.ReachUs));
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -21,16 +24,31 @@ import { NativeSelect, NativeSelectOptGroup, NativeSelectOption } from "@/compon
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { parentsCopy } from "@/site-pages/parents/copy";
 
 type Status = "idle" | "sending" | "sent" | "unavailable" | "captcha" | "rate_limited" | "invalid";
 
-export function FeedbackForm({ locale }: { locale: Locale }) {
-  const copy = parentsCopy[locale].feedback;
+// The texts come from the page (site-pages/parents/copy.ts, this language only), so the
+// browser does not download the whole Parents copy in four languages. `sent` holds "{ref}".
+export type FeedbackFormCopy = {
+  kind: string;
+  kinds: Record<(typeof feedbackKinds)[number], string>;
+  name: string;
+  phone: string;
+  email: string;
+  oneWay: string;
+  grade: string;
+  gradeNone: string;
+  message: string;
+  consent: string;
+  send: string;
+  sent: string;
+};
+
+export function FeedbackForm({ locale, copy }: { locale: Locale; copy: FeedbackFormCopy }) {
   const id = useId();
   const t = messages[locale];
   const s = t.station;
-  const { ref: captchaRef, token, failed } = useTurnstile(locale);
+  const { ref: captchaRef, token, failed, reset } = useTurnstile(locale);
   const [kind, setKind] = useState<string>("suggestion");
   const [status, setStatus] = useState<Status>("idle");
   const [reference, setReference] = useState("");
@@ -66,8 +84,10 @@ export function FeedbackForm({ locale }: { locale: Locale }) {
         setFields(result.fields);
         return setStatus("invalid");
       }
+      reset();
       setStatus(result.error);
     } catch {
+      reset();
       setStatus("unavailable");
     }
   }
@@ -75,7 +95,7 @@ export function FeedbackForm({ locale }: { locale: Locale }) {
   if (status === "sent") {
     return (
       <Alert role="status">
-        <AlertDescription className="text-base text-ink">{copy.sent(reference)}</AlertDescription>
+        <AlertDescription className="text-base text-ink">{copy.sent.replace("{ref}", reference)}</AlertDescription>
       </Alert>
     );
   }
@@ -155,20 +175,20 @@ export function FeedbackForm({ locale }: { locale: Locale }) {
           </label>
         </div>
 
-        <div ref={captchaRef} className="min-h-[65px] sm:col-span-2" />
+        {failed ? null : <div ref={captchaRef} className="min-h-[65px] sm:col-span-2" />}
 
         <div className="sm:col-span-2">
-          <Button type="submit" size="lg" disabled={status === "sending"}>
+          <Button type="submit" size="lg" disabled={status === "sending" || failed}>
             {status === "sending" ? <Spinner data-icon="inline-start" /> : null}
             {status === "sending" ? s.sending : copy.send}
           </Button>
         </div>
 
-        {status === "invalid" || status === "captcha" || status === "rate_limited" || status === "unavailable" || failed ? (
-          <Alert variant={status === "unavailable" || failed ? "default" : "destructive"} className="sm:col-span-2">
-            <AlertDescription className="text-base">
-              {status === "invalid" ? s.fix : status === "captcha" ? s.captcha : status === "rate_limited" ? s.rateLimited : s.unavailable}
-            </AlertDescription>
+        {status === "unavailable" || failed ? (
+          <ReachUs locale={locale} className="sm:col-span-2" />
+        ) : status === "invalid" || status === "captcha" || status === "rate_limited" ? (
+          <Alert variant="destructive" className="sm:col-span-2">
+            <AlertDescription className="text-base">{status === "invalid" ? s.fix : status === "captcha" ? s.captcha : s.rateLimited}</AlertDescription>
           </Alert>
         ) : null}
       </FieldGroup>

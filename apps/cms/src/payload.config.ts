@@ -13,6 +13,8 @@ import { fr } from '@payloadcms/translations/languages/fr'
 import { tr } from '@payloadcms/translations/languages/tr'
 import { AuditLog, auditLogPlugin } from './collections/AuditLog'
 import { maintenance } from './endpoints/maintenance'
+import type { MailBinding } from '@maarif/mail'
+import { cloudflareEmailAdapter } from './email/adapter'
 
 import { ApiClients } from './collections/ApiClients'
 import { Inquiries } from './collections/Inquiries'
@@ -33,6 +35,8 @@ import { PageVisuals } from './collections/PageVisuals'
 import { PrivateFiles } from './collections/PrivateFiles'
 import { Redirects } from './collections/Redirects'
 import { Trips } from './collections/Trips'
+import { Newsletters } from './collections/Newsletters'
+import { Subscribers } from './collections/Subscribers'
 import { Gallery } from './globals/Gallery'
 import { HeadMessage } from './globals/HeadMessage'
 import { HomeHero } from './globals/HomeHero'
@@ -132,6 +136,8 @@ export default buildConfig({
     Applications,
     PrivateFiles,
     Redirects,
+    Subscribers,
+    Newsletters,
     AuditLog,
   ],
   globals: [HeadMessage, HomeHero, Gallery, SchoolFacts, Timetables, SiteSettings],
@@ -149,6 +155,8 @@ export default buildConfig({
     fallback: false,
   },
   upload: { limits: { fileSize: 10 * 1024 * 1024 } },
+  // Wave 4 (ADR 011): emails through this Worker's Cloudflare Email Service binding (email/adapter.ts).
+  email: cloudflareEmailAdapter(() => (cloudflare.env as { EMAIL?: MailBinding }).EMAIL),
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

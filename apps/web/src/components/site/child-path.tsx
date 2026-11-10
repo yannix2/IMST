@@ -76,7 +76,7 @@ export function ChildPath({ locale }: { locale: Locale }) {
           <article className="plate relative flex h-full flex-col gap-6 overflow-hidden rounded-[var(--radius-plate)] bg-navy p-7 text-white shadow-raised sm:p-9">
             <span aria-hidden="true" className={cn("absolute inset-x-0 top-0 h-[var(--line-thickness)]", lineBg[levelOfGrade(grade)])} />
             <div>
-              <p className="text-sm font-medium text-turquoise">{w.title}</p>
+              <p className="text-sm font-medium text-turquoise-plate">{w.title}</p>
               <h3 className="mt-2 font-heading text-4xl font-bold">{name}</h3>
               <p className="mt-1 text-on-plate-muted">
                 {t.levels.ages(...gradeAges[grade])} · {stageOf(grade)}
@@ -94,7 +94,7 @@ export function ChildPath({ locale }: { locale: Locale }) {
                     <ol className="flex flex-col gap-1">
                       {ahead.map(([g, exam]) => (
                         <li key={g} className="flex items-baseline gap-2">
-                          <span className="tabular shrink-0 text-sm whitespace-nowrap text-turquoise">{t.grade(Number(g.slice(5)))}</span>
+                          <span className="tabular shrink-0 text-sm whitespace-nowrap text-turquoise-plate">{t.grade(Number(g.slice(5)))}</span>
                           <span lang="en" className="font-medium">
                             {exam}
                           </span>

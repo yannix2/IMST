@@ -87,6 +87,8 @@ export interface Config {
     applications: Application;
     'private-files': PrivateFile;
     redirects: Redirect;
+    subscribers: Subscriber;
+    newsletters: Newsletter;
     'audit-log': AuditLog;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -114,6 +116,8 @@ export interface Config {
     applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
     'private-files': PrivateFilesSelect<false> | PrivateFilesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
+    subscribers: SubscribersSelect<false> | SubscribersSelect<true>;
+    newsletters: NewslettersSelect<false> | NewslettersSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -194,6 +198,10 @@ export interface ApiClientAuthOperations {
 export interface User {
   id: number;
   name: string;
+  /**
+   * The invitation and password emails use this language. When you create an account, type any temporary password: the person receives an email to choose their own (the link works for 72 hours).
+   */
+  language?: ('en' | 'fr' | 'ar' | 'tr') | null;
   roles: ('admin' | 'editor' | 'reviewer' | 'admissions')[];
   updatedAt: string;
   createdAt: string;
@@ -408,6 +416,18 @@ export interface Inquiry {
    * Internal notes. Never shared with the family.
    */
   staffNotes?: string | null;
+  /**
+   * Agree the day with the family, then set it here and tick the box: the parent receives "Your visit is confirmed" in their language when you save.
+   */
+  visit?: {
+    confirmedFor?: string | null;
+    /**
+     * Empty = the campus of the grade asked for.
+     */
+    campus?: ('schools' | 'highSchool') | null;
+    sendConfirmation?: boolean | null;
+    confirmationSentAt?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -843,6 +863,67 @@ export interface Redirect {
   createdAt: string;
 }
 /**
+ * People who signed up on the website. Only confirmed addresses receive the newsletter; nobody can be added by hand.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscribers".
+ */
+export interface Subscriber {
+  id: number;
+  email: string;
+  locale: 'en' | 'fr' | 'ar' | 'tr';
+  status: 'pending' | 'confirmed' | 'unsubscribed';
+  consentAt?: string | null;
+  confirmedAt?: string | null;
+  unsubscribedAt?: string | null;
+  unsubscribeReason?: ('request' | 'bounced') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Write in English first (required), then the other languages. Send yourself a test, set "Ready to send", save, and a reviewer sends it.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsletters".
+ */
+export interface Newsletter {
+  id: number;
+  /**
+   * The email subject, also the title inside the email.
+   */
+  subject?: string | null;
+  /**
+   * Optional: the grey line inboxes show after the subject.
+   */
+  preheader?: string | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  status: 'draft' | 'ready' | 'sending' | 'sent';
+  stats?: {
+    total?: number | null;
+    sent?: number | null;
+    failed?: number | null;
+    cursor?: number | null;
+    sendRequestedAt?: string | null;
+    sentAt?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "audit-log".
  */
@@ -964,6 +1045,14 @@ export interface PayloadLockedDocument {
         value: number | Redirect;
       } | null)
     | ({
+        relationTo: 'subscribers';
+        value: number | Subscriber;
+      } | null)
+    | ({
+        relationTo: 'newsletters';
+        value: number | Newsletter;
+      } | null)
+    | ({
         relationTo: 'audit-log';
         value: number | AuditLog;
       } | null);
@@ -1025,6 +1114,7 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  language?: T;
   roles?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1136,6 +1226,14 @@ export interface InquiriesSelect<T extends boolean = true> {
   details?: T;
   privacyNoticeAcceptedAt?: T;
   staffNotes?: T;
+  visit?:
+    | T
+    | {
+        confirmedFor?: T;
+        campus?: T;
+        sendConfirmation?: T;
+        confirmationSentAt?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1410,6 +1508,43 @@ export interface RedirectsSelect<T extends boolean = true> {
   from?: T;
   to?: T;
   permanent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscribers_select".
+ */
+export interface SubscribersSelect<T extends boolean = true> {
+  email?: T;
+  locale?: T;
+  status?: T;
+  consentAt?: T;
+  confirmedAt?: T;
+  unsubscribedAt?: T;
+  unsubscribeReason?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "newsletters_select".
+ */
+export interface NewslettersSelect<T extends boolean = true> {
+  subject?: T;
+  preheader?: T;
+  body?: T;
+  status?: T;
+  stats?:
+    | T
+    | {
+        total?: T;
+        sent?: T;
+        failed?: T;
+        cursor?: T;
+        sendRequestedAt?: T;
+        sentAt?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

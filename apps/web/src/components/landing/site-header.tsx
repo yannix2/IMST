@@ -1,5 +1,5 @@
-import { CalendarCheckIcon, ChevronDownIcon, LanguagesIcon } from "lucide-react";
-import { localeDirection, localeNativeName, locales, type Locale } from "@maarif/contracts/locales";
+import { CalendarCheckIcon, ChevronDownIcon } from "lucide-react";
+import { localeNativeName, type Locale } from "@maarif/contracts/locales";
 import { messages } from "@/i18n/messages";
 import { pageNames } from "@/i18n/pages";
 import { builtAreas, menuPages, pathOf } from "@/lib/navigation";
@@ -7,7 +7,7 @@ import { visitHash } from "@/lib/visit";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { CtaSpark } from "./cta-spark";
-import { LanguageTabs } from "./language-tabs";
+import { LanguageTabs, LocaleFlag } from "./language-tabs";
 import { MobileNav } from "./mobile-nav";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -93,32 +93,25 @@ export function SiteHeader({ locale, path = "" }: { locale: Locale; path?: strin
       <div className="flex items-center gap-2 sm:gap-3">
         <LanguageTabs locale={locale} label={t.nav.language} className="hidden 2xl:block" tone="ground" path={path} />
         <div className="hidden xl:block 2xl:hidden">
+          {/* The current flag; the panel holds the four flags (names for screen readers and on hover). */}
           <button
             type="button"
             popoverTarget="menu-language"
-            aria-label={t.nav.language}
-            className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full px-3.5 font-medium text-ink ring-1 ring-rule transition-colors hover:bg-mist"
+            aria-label={`${t.nav.language}: ${localeNativeName[locale]}`}
+            title={localeNativeName[locale]}
+            className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full ps-2 pe-2.5 text-ink ring-1 ring-rule transition-colors hover:bg-mist"
           >
-            <LanguagesIcon aria-hidden="true" className="size-4" />
-            <span lang={locale}>{localeNativeName[locale]}</span>
+            <LocaleFlag locale={locale} />
+            <ChevronDownIcon aria-hidden="true" className="size-4 text-slate" />
           </button>
-          <div id="menu-language" popover="auto" aria-label={t.nav.language} className={cn(panel, "w-[min(calc(100%-2*var(--gutter)),24rem)] p-3")}>
-            <ul className="grid grid-cols-2 gap-1">
-              {locales.map((code) => (
-                <li key={code}>
-                  <a
-                    href={`/${code}${path}`}
-                    hrefLang={code}
-                    lang={code}
-                    dir={localeDirection[code]}
-                    aria-current={code === locale ? "page" : undefined}
-                    className="flex min-h-11 items-center justify-center rounded-full px-4 font-medium text-ink no-underline hover:bg-mist aria-[current=page]:bg-navy aria-[current=page]:text-white"
-                  >
-                    {localeNativeName[code]}
-                  </a>
-                </li>
-              ))}
-            </ul>
+          {/* Under its button, at the content edge (the area panels are centred). */}
+          <div
+            id="menu-language"
+            popover="auto"
+            aria-label={t.nav.language}
+            className="fixed start-auto end-[max(var(--gutter),calc((100vw-var(--content-max))/2+var(--gutter)))] top-[5.5rem] bottom-auto m-0 w-fit rounded-full border-0 bg-mist p-1 text-ink shadow-raised ring-1 ring-rule/70"
+          >
+            <LanguageTabs locale={locale} label={t.nav.language} tone="ground" path={path} framed={false} />
           </div>
         </div>
         <ThemeToggle label={t.nav.theme} />

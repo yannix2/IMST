@@ -15,6 +15,16 @@ async function count(payload: Payload, user: User, collection: string, where: Re
   }
 }
 
+async function latestSent(payload: Payload, user: User): Promise<{ id: number; subject?: string; sent?: number; sentAt?: string } | null> {
+  try {
+    const { docs } = await payload.find({ collection: 'newsletters' as never, where: { status: { equals: 'sent' } } as never, sort: '-stats.sentAt', limit: 1, depth: 0, user: user as never, overrideAccess: false })
+    const d = docs[0] as { id: number; subject?: string; stats?: { sent?: number; sentAt?: string } } | undefined
+    return d ? { id: d.id, subject: d.subject, sent: d.stats?.sent, sentAt: d.stats?.sentAt } : null
+  } catch {
+    return null
+  }
+}
+
 export async function Dashboard({ payload, user, req }: { payload: Payload; user: User; req?: PayloadRequest }) {
   void req
   const roles = user?.roles ?? []
@@ -25,7 +35,11 @@ export async function Dashboard({ payload, user, req }: { payload: Payload; user
     { label: 'New messages from parents and visitors', value: await count(payload, user, 'inquiries', { status: { equals: 'new' }, kind: { in: ['contact', 'feedback'] } }), href: '/admin/collections/inquiries?where[status][equals]=new', show: is('admissions') },
     { label: 'New job applications', value: await count(payload, user, 'applications', { status: { equals: 'new' } }), href: '/admin/collections/applications?where[status][equals]=new', show: is() },
     { label: 'Photos waiting for a consent decision', value: await count(payload, user, 'media', { consent: { equals: 'pending' } }), href: '/admin/collections/media?where[consent][equals]=pending', show: is('reviewer', 'editor') },
+    // Wave 4: the newsletter.
+    { label: 'Newsletter subscribers (confirmed)', value: await count(payload, user, 'subscribers', { status: { equals: 'confirmed' } }), href: '/admin/collections/subscribers?where[status][equals]=confirmed', show: is() },
+    { label: 'Newsletters ready to send', value: await count(payload, user, 'newsletters', { status: { equals: 'ready' } }), href: '/admin/collections/newsletters?where[status][equals]=ready', show: is('reviewer') },
   ]
+  const lastNewsletter = is('editor', 'reviewer') ? await latestSent(payload, user) : null
   let drafts = 0
   if (is('reviewer', 'editor')) {
     for (const c of draftCollections) drafts += (await count(payload, user, c, { _status: { equals: 'draft' } })) ?? 0
@@ -37,6 +51,7 @@ export async function Dashboard({ payload, user, req }: { payload: Payload; user
     { label: 'Choose the photos of a page', href: '/admin/collections/page-visuals', show: is('editor', 'reviewer') },
     { label: 'This week’s canteen menu', href: '/admin/collections/weekly-menus', show: is('editor', 'reviewer') },
     { label: 'Post a job opening', href: '/admin/collections/jobs/create', show: is('editor', 'reviewer') },
+    { label: 'Write a newsletter', href: '/admin/collections/newsletters/create', show: is('editor', 'reviewer') },
     { label: 'Staff accounts', href: '/admin/collections/users', show: is() },
     { label: 'Site settings (notifications, analytics)', href: '/admin/globals/site-settings', show: is() },
   ]
@@ -62,6 +77,13 @@ export async function Dashboard({ payload, user, req }: { payload: Payload; user
             <strong style={{ fontSize: '2rem', display: 'block', color: drafts ? '#00737C' : 'inherit' }}>{drafts}</strong>
             Drafts not yet published{is('reviewer') ? ' (a reviewer publishes them)' : ''}
           </div>
+        ) : null}
+        {lastNewsletter ? (
+          <a href={`/admin/collections/newsletters/${lastNewsletter.id}`} style={{ ...box, textDecoration: 'none', color: 'inherit' }}>
+            <strong style={{ fontSize: '2rem', display: 'block' }}>{lastNewsletter.sent ?? 0}</strong>
+            Emails in the last newsletter{lastNewsletter.subject ? `, “${lastNewsletter.subject}”` : ''}
+            {lastNewsletter.sentAt ? ` (${lastNewsletter.sentAt.slice(0, 10)})` : ''}
+          </a>
         ) : null}
       </div>
       <h3 style={{ margin: '1.5rem 0 0.5rem' }}>Quick links</h3>

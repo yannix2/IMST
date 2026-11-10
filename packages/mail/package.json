@@ -1,0 +1,21 @@
+{
+  "name": "@maarif/mail",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Emails of the school website (wave 4, ADR 011): Cloudflare Email Service wrapper, branded layout and templates in four languages. Used by maarif-api and maarifcms.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@maarif/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  }
+}

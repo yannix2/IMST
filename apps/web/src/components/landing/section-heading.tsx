@@ -18,7 +18,7 @@ export function SectionHeading({ id, title, lede, eyebrow, icon, tone = "ground"
     <div className={cn("flex items-start gap-5", className)}>
       {icon ? <div className="hidden shrink-0 sm:block">{icon}</div> : null}
       <div className="min-w-0">
-        {eyebrow ? <p className={cn("mb-2 text-sm font-bold tracking-wide uppercase", plate ? "text-turquoise" : "text-turquoise-ink")}>{eyebrow}</p> : null}
+        {eyebrow ? <p className={cn("mb-2 text-sm font-bold tracking-wide uppercase", plate ? "text-turquoise-plate" : "text-turquoise-ink")}>{eyebrow}</p> : null}
         <h2 id={id} className={cn("text-[length:var(--text-headline)] leading-[var(--leading-headline)] font-bold text-balance", plate ? "text-white" : "text-heading")}>
           {title}
         </h2>

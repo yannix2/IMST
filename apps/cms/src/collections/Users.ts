@@ -1,5 +1,6 @@
 import { APIError, type CollectionConfig } from 'payload'
 import { adminOnly, adminOnlyField, hasRole, staffRoles } from '../access/roles'
+import { forgotPasswordEmail, inviteOnCreate } from '../email/accounts'
 
 // Staff accounts. Passwords: at least 12 characters (ARCHITECTURE.md section 4); 5 failed logins
 // lock the account for 15 minutes; a session lasts one working day. Keep two administrators so
@@ -26,6 +27,9 @@ export const Users: CollectionConfig = {
     maxLoginAttempts: 5,
     lockTime: 15 * 60 * 1000, // 15 minutes
     cookies: { secure: true, sameSite: 'Strict' },
+    // Wave 4: the reset email in the school layout and the person's language. No `expiration`
+    // here on purpose: resets keep Payload's 1 hour, invitations ask for 72 hours (email/accounts.ts).
+    forgotPassword: forgotPasswordEmail,
   },
   access: {
     // Staff see their own account; administrators manage everyone.
@@ -44,9 +48,27 @@ export const Users: CollectionConfig = {
         return data
       },
     ],
+    // Wave 4: a new account gets an invitation email to choose its own password.
+    afterChange: [inviteOnCreate],
   },
   fields: [
     { name: 'name', type: 'text', required: true },
+    {
+      name: 'language',
+      label: 'Language of emails',
+      type: 'select',
+      defaultValue: 'en',
+      options: [
+        { label: 'English', value: 'en' },
+        { label: 'Français', value: 'fr' },
+        { label: 'العربية', value: 'ar' },
+        { label: 'Türkçe', value: 'tr' },
+      ],
+      admin: {
+        description:
+          'The invitation and password emails use this language. When you create an account, type any temporary password: the person receives an email to choose their own (the link works for 72 hours).',
+      },
+    },
     {
       name: 'roles',
       type: 'select',

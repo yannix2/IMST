@@ -47,6 +47,14 @@ export const maintenance: Endpoint = {
       applications: await purge(req, 'applications', monthsAgo(r.applicationsMonths ?? 6)),
       auditLog: await purge(req, 'audit-log', monthsAgo(r.auditLogMonths ?? 12)),
       orphanCvs: 0,
+      // Wave 4: newsletter sign-ups never confirmed within 30 days (the address stays unused).
+      pendingSubscribers: 0,
+    }
+    {
+      const before = new Date(Date.now() - 30 * 86_400_000).toISOString()
+      const { docs } = await req.payload.find({ collection: 'subscribers', where: { and: [{ status: { equals: 'pending' } }, { updatedAt: { less_than: before } }] }, limit: 500, depth: 0, overrideAccess: true, req })
+      for (const doc of docs) await req.payload.delete({ collection: 'subscribers', id: doc.id, overrideAccess: true, req, context: { skipAudit: true } })
+      deleted.pendingSubscribers = docs.length
     }
     // CVs stored but never attached (an application that failed after the upload), after a day.
     const yesterday = new Date(Date.now() - 86_400_000).toISOString()

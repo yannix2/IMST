@@ -64,6 +64,8 @@ export const inquiriesCsv = exportCsv('inquiries', ['admissions'], [
   { label: 'Preferred time', value: detail('preferredSlot') },
   { label: 'Topic', value: (d) => detail('topic')(d) ?? detail('feedbackKind')(d) },
   { label: 'Message', value: field('message') },
+  { label: 'Visit confirmed for', value: (d) => (d.visit as { confirmedFor?: unknown } | undefined)?.confirmedFor },
+  { label: 'Confirmation emailed', value: (d) => (d.visit as { confirmationSentAt?: unknown } | undefined)?.confirmationSentAt },
   { label: 'Staff notes', value: field('staffNotes') },
 ])
 

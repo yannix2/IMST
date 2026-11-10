@@ -20,17 +20,22 @@
   // results are cached at the edge.
   "images": { "binding": "IMAGES" },
 
-  // Staff notifications (ADR 009). Needs Cloudflare Email Routing on the sender's domain; only
-  // verified destination addresses receive mail.
-  "send_email": [{ "name": "MAILER" }],
+  // Email (ADR 011): Cloudflare Email Service on Workers Paid sends to any recipient (staff
+  // notifications, confirmations to families, the newsletter). No destination restriction here.
+  // The sender domain (MAIL_DOMAIN) must be onboarded in Email Service > Email Sending.
+  "send_email": [{ "name": "EMAIL" }],
 
   "vars": {
     "ADMIN_URL": "https://cms.yassinekhiari.download",
-    "MAIL_FROM": "noreply@yassinekhiari.download"
+    // The public site: Turnstile tokens must be solved on this host; links in emails.
+    "SITE_URL": "https://yassinekhiari.download",
+    // Emails leave from noreply@ / info@ of this domain (packages/mail senders.ts).
+    "MAIL_DOMAIN": "yassinekhiari.download"
   },
 
-  // Nightly retention and backup in maarifcms, at 03:00 Tunis time (02:00 UTC). See src/scheduled.ts.
-  "triggers": { "crons": ["0 2 * * *"] },
+  // Nightly retention and backup in maarifcms, at 03:00 Tunis time (02:00 UTC); every five minutes,
+  // the next batch of a newsletter being sent (wave 4). See src/scheduled.ts.
+  "triggers": { "crons": ["0 2 * * *", "*/5 * * * *"] },
 
   "ratelimits": [
     {

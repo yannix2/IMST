@@ -3,14 +3,13 @@
 // The visit booking form. Loaded on demand (visit-station.tsx) so its fields, Turnstile and
 // validation messages cost nothing until a family starts booking.
 import { useEffect, useRef, useState } from "react";
-import { MessageCircleIcon, PhoneIcon } from "lucide-react";
 import type { Locale } from "@maarif/contracts/locales";
 import type { Grade } from "@maarif/contracts/school";
 import type { FormResult } from "@maarif/contracts/forms";
 import { messages } from "@/i18n/messages";
-import { telHref, whatsappHref } from "@/lib/school";
 import { updateRoute } from "@/lib/route-store";
-import { loadTurnstile, TURNSTILE_SITE_KEY } from "@/lib/turnstile";
+import { useTurnstile } from "@/lib/use-turnstile";
+import { ReachUs } from "@/components/site/reach-us";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -39,9 +38,8 @@ export default function VisitForm({ id, locale, grade, gradeName, phone, focusFi
   const [status, setStatus] = useState<Status>("idle");
   const [reference, setReference] = useState("");
   const [fields, setFields] = useState<Record<string, string>>({});
-  const [token, setToken] = useState("");
   const [minDate, setMinDate] = useState("");
-  const captchaRef = useRef<HTMLDivElement>(null);
+  const { ref: captchaRef, token, failed, reset } = useTurnstile(locale);
   const nameRef = useRef<HTMLInputElement>(null);
   const focusOnMount = useRef(focusFirstField);
 
@@ -49,26 +47,7 @@ export default function VisitForm({ id, locale, grade, gradeName, phone, focusFi
     const tomorrow = new Date(Date.now() + 86_400_000);
     setMinDate(tomorrow.toISOString().slice(0, 10));
     if (focusOnMount.current) nameRef.current?.focus();
-
-    let widget: string | undefined;
-    let cancelled = false;
-    loadTurnstile()
-      .then(() => {
-        if (cancelled || !captchaRef.current || !window.turnstile) return;
-        widget = window.turnstile.render(captchaRef.current, {
-          sitekey: TURNSTILE_SITE_KEY,
-          language: locale,
-          theme: "light",
-          callback: (value: string) => setToken(value),
-          "expired-callback": () => setToken(""),
-        });
-      })
-      .catch(() => setStatus("unavailable"));
-    return () => {
-      cancelled = true;
-      if (widget && window.turnstile) window.turnstile.remove(widget);
-    };
-  }, [locale]);
+  }, []);
 
   async function submit(event: { preventDefault(): void; currentTarget: HTMLFormElement }) {
     event.preventDefault();
@@ -105,29 +84,15 @@ export default function VisitForm({ id, locale, grade, gradeName, phone, focusFi
         setFields(result.fields);
         return setStatus("invalid");
       }
+      reset();
       setStatus(result.error);
     } catch {
+      reset();
       setStatus("unavailable");
     }
   }
 
   const error = (name: string) => (fields[name] ? s.errors[fields[name]] ?? s.fix : undefined);
-  const reachUs = (
-    <div className="mt-3 flex flex-wrap gap-2">
-      <Button asChild variant="outline">
-        <a href={telHref(phone)}>
-          <PhoneIcon data-icon="inline-start" />
-          <span className="tabular" dir="ltr">{phone}</span>
-        </a>
-      </Button>
-      <Button asChild variant="outline">
-        <a href={whatsappHref(s.whatsappMessage(gradeName || t.schoolName))} target="_blank" rel="noopener noreferrer">
-          <MessageCircleIcon data-icon="inline-start" />
-          {s.whatsapp}
-        </a>
-      </Button>
-    </div>
-  );
 
   return (
     <form
@@ -190,20 +155,21 @@ export default function VisitForm({ id, locale, grade, gradeName, phone, focusFi
             </label>
           </div>
 
-          <div ref={captchaRef} className="sm:col-span-2" />
+          {failed ? null : <div ref={captchaRef} className="min-h-[65px] sm:col-span-2" />}
 
           <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:items-center">
-            <Button type="submit" size="lg" disabled={status === "sending"}>
+            <Button type="submit" size="lg" disabled={status === "sending" || failed}>
               {status === "sending" ? <Spinner data-icon="inline-start" /> : null}
               {status === "sending" ? s.sending : s.send}
             </Button>
           </div>
 
-          {status === "invalid" || status === "captcha" || status === "rate_limited" || status === "unavailable" ? (
-            <Alert variant={status === "unavailable" ? "default" : "destructive"} className="sm:col-span-2">
+          {status === "unavailable" || failed ? (
+            <ReachUs locale={locale} text={s.unavailable} topic={gradeName} phone={phone} className="sm:col-span-2" />
+          ) : status === "invalid" || status === "captcha" || status === "rate_limited" ? (
+            <Alert variant="destructive" className="sm:col-span-2">
               <AlertDescription className="text-base">
-                {status === "invalid" ? s.fix : status === "captcha" ? s.captcha : status === "rate_limited" ? s.rateLimited : s.unavailable}
-                {status === "unavailable" ? reachUs : null}
+                {status === "invalid" ? s.fix : status === "captcha" ? s.captcha : s.rateLimited}
               </AlertDescription>
             </Alert>
           ) : null}

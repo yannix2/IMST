@@ -12,6 +12,9 @@ const cvRules = { mimeType: "application/pdf", maxBytes: 5 * 1024 * 1024 } as co
 import type { Locale } from "@maarif/contracts/locales";
 import { messages } from "@/i18n/messages";
 import { useTurnstile } from "@/lib/use-turnstile";
+import dynamic from "next/dynamic";
+// Shown only when sending fails: fetched then, not with the page (JS budget).
+const ReachUs = dynamic(() => import("@/components/site/reach-us").then((m) => m.ReachUs));
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -27,7 +30,7 @@ export function ApplicationForm({ locale, job, position }: { locale: Locale; job
   const copy = careersCopy[locale].form;
   const id = useId();
   const s = messages[locale].station;
-  const { ref: captchaRef, token, failed } = useTurnstile(locale);
+  const { ref: captchaRef, token, failed, reset } = useTurnstile(locale);
   const [status, setStatus] = useState<Status>("idle");
   const [reference, setReference] = useState("");
   const [fields, setFields] = useState<Record<string, string>>({});
@@ -60,8 +63,10 @@ export function ApplicationForm({ locale, job, position }: { locale: Locale; job
         setFields(result.fields);
         return setStatus("invalid");
       }
+      reset();
       setStatus(result.error);
     } catch {
+      reset();
       setStatus("unavailable");
     }
   }
@@ -135,20 +140,20 @@ export function ApplicationForm({ locale, job, position }: { locale: Locale; job
           </label>
         </div>
 
-        <div ref={captchaRef} className="min-h-[65px] sm:col-span-2" />
+        {failed ? null : <div ref={captchaRef} className="min-h-[65px] sm:col-span-2" />}
 
         <div className="sm:col-span-2">
-          <Button type="submit" size="lg" disabled={status === "sending"}>
+          <Button type="submit" size="lg" disabled={status === "sending" || failed}>
             {status === "sending" ? <Spinner data-icon="inline-start" /> : null}
             {status === "sending" ? s.sending : copy.send}
           </Button>
         </div>
 
-        {status === "invalid" || status === "captcha" || status === "rate_limited" || status === "unavailable" || failed ? (
-          <Alert variant={status === "unavailable" || failed ? "default" : "destructive"} className="sm:col-span-2">
-            <AlertDescription className="text-base">
-              {status === "invalid" ? s.fix : status === "captcha" ? s.captcha : status === "rate_limited" ? s.rateLimited : s.unavailable}
-            </AlertDescription>
+        {status === "unavailable" || failed ? (
+          <ReachUs locale={locale} topic={position} className="sm:col-span-2" />
+        ) : status === "invalid" || status === "captcha" || status === "rate_limited" ? (
+          <Alert variant="destructive" className="sm:col-span-2">
+            <AlertDescription className="text-base">{status === "invalid" ? s.fix : status === "captcha" ? s.captcha : s.rateLimited}</AlertDescription>
           </Alert>
         ) : null}
       </FieldGroup>

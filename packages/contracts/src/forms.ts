@@ -124,6 +124,14 @@ export const applicationSchema = z.object({
 });
 export type Application = z.infer<typeof applicationSchema>;
 
+// Newsletter sign-up (wave 4, owner decision 2026-11-09): the footer form. Double opt-in: maarifcms
+// emails a confirmation link; only confirmed addresses ever receive the newsletter.
+export const newsletterSignupSchema = z.object({
+  ...formBase,
+  email: z.email("invalid_email").max(254, "too_long"),
+});
+export type NewsletterSignup = z.infer<typeof newsletterSignupSchema>;
+
 // What apps/api answers to every form submission.
 export type FormResult =
   | { ok: true; reference: string }

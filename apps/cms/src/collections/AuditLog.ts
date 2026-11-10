@@ -34,7 +34,7 @@ export const AuditLog: CollectionConfig = {
 // Collections whose changes are not worth logging (the log itself, system bookkeeping), and the
 // ones holding personal data where only the fact of a change is logged (never a title).
 const skip = new Set(['audit-log', 'payload-locked-documents', 'payload-preferences', 'payload-migrations', 'payload-kv', 'payload-jobs'])
-const personal = new Set(['inquiries', 'applications', 'private-files', 'users'])
+const personal = new Set(['inquiries', 'applications', 'private-files', 'users', 'subscribers'])
 
 type Doc = Record<string, unknown>
 const titleOf = (target: string, doc: Doc) => {

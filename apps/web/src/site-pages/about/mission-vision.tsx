@@ -118,7 +118,7 @@ export function MissionVisionPage({ locale }: { locale: Locale }) {
           <PageSection id="statements" tone="mist">
             <div className="grid gap-5 lg:grid-cols-12">
               <article className="plate flex flex-col gap-5 rounded-[var(--radius-plate)] bg-navy p-7 text-white shadow-raised sm:p-10 lg:col-span-7">
-                <h2 className="font-heading text-sm font-bold text-turquoise">{c.visionTitle}</h2>
+                <h2 className="font-heading text-sm font-bold text-turquoise-plate">{c.visionTitle}</h2>
                 <p className="font-heading text-2xl leading-snug font-bold text-balance sm:text-3xl">{c.vision[0]}</p>
                 <p className="text-lg text-on-plate-muted">{c.vision[1]}</p>
               </article>

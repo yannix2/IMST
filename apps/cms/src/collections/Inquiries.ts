@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { formKinds, grades, locales } from '@maarif/contracts'
 import { hasRole, isGateway } from '../access/roles'
 import { inquiriesCsv } from '../endpoints/exportCsv'
+import { confirmVisit } from '../email/visits'
 
 // Form entries from the public site (pre-registration, visit booking, contact).
 // Personal data: only admissions staff and administrators can read them; only the
@@ -46,6 +47,32 @@ export const Inquiries: CollectionConfig = {
       access: { create: () => false },
       admin: { description: 'Internal notes. Never shared with the family.' },
     },
+    // Wave 4: confirming a visit by email (email/visits.ts). Staff only; visit requests only.
+    {
+      name: 'visit',
+      label: 'Visit confirmation',
+      type: 'group',
+      access: { create: () => false },
+      admin: {
+        condition: (data) => data?.kind === 'visit-booking',
+        description: 'Agree the day with the family, then set it here and tick the box: the parent receives "Your visit is confirmed" in their language when you save.',
+      },
+      fields: [
+        { name: 'confirmedFor', label: 'Date and time of the visit', type: 'date', admin: { date: { pickerAppearance: 'dayAndTime', timeIntervals: 15 } } },
+        {
+          name: 'campus',
+          type: 'select',
+          options: [
+            { label: 'Le Kram (Kindergarten to Year 9)', value: 'schools' },
+            { label: 'Charguia 2 (Years 10 to 13)', value: 'highSchool' },
+          ],
+          admin: { description: 'Empty = the campus of the grade asked for.' },
+        },
+        { name: 'sendConfirmation', label: 'Send the confirmation email when I save', type: 'checkbox', defaultValue: false },
+        { name: 'confirmationSentAt', label: 'Confirmation sent', type: 'date', admin: { readOnly: true, date: { pickerAppearance: 'dayAndTime' } } },
+      ],
+    },
   ],
+  hooks: { beforeChange: [confirmVisit] },
   timestamps: true,
 }

@@ -68,10 +68,13 @@ export async function Hero({ locale }: { locale: Locale }) {
 
       <div className="mx-auto w-full max-w-[var(--content-max)] px-[var(--gutter)] pt-28 pb-20 lg:pb-24">
         <div className="max-w-[40rem]">
-          {/* sign-headline: switching language flips this plate (cross-document view transition). */}
+          {/* sign-headline: switching language flips this plate (cross-document view transition).
+              Arabic: an em width, not ch. While Readex Pro is loading the browser cannot measure
+              "0" and takes 1ch = 0.5em, so the headline first wrapped on 3 lines, then 2 (CLS 0.057,
+              wave 4 D1). 9.65em is what 16ch measures once the font is in. */}
           <h1
             id="hero-title"
-            className="sign-headline max-w-[16ch] text-[length:var(--text-display)] leading-[var(--leading-display)] font-bold tracking-tight text-balance text-white"
+            className="sign-headline max-w-[16ch] rtl:max-w-[9.65em] text-[length:var(--text-display)] leading-[var(--leading-display)] font-bold tracking-tight text-balance text-white"
           >
             {t.hero.headline}
           </h1>
@@ -94,7 +97,7 @@ export async function Hero({ locale }: { locale: Locale }) {
               </li>
             ))}
           </ul>
-          <p className="mt-6 max-w-[54ch] text-lg text-white/90">{t.hero.lede}</p>
+          <p className="mt-6 max-w-[54ch] rtl:max-w-[32.5em] text-lg text-white/90">{t.hero.lede}</p>
 
           <div id="hero-actions" className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <CtaSpark className="w-full sm:w-auto">
