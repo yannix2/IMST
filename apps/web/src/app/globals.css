@@ -101,6 +101,20 @@
  * own language, so an Arabic name inside an English page, or a Turkish one inside an Arabic
  * page, is always set in its own script's face. Arabic has one face for headlines and body.
  */
+/* Readex Pro, self-hosted (src/lib/fonts.ts): one family per subset, stacked like Google's single
+   family, then Google's metric fallback for Arial (values copied from next/font/google's output). */
+@font-face {
+  font-family: "Readex Pro Fallback";
+  src: local(Arial);
+  ascent-override: 92.3%;
+  descent-override: 23.07%;
+  line-gap-override: 0%;
+  size-adjust: 108.34%;
+}
+.font-root {
+  --font-readex: var(--font-readex-arabic), var(--font-readex-latin), var(--font-readex-latin-ext),
+    var(--font-readex-vietnamese), "Readex Pro Fallback";
+}
 .font-root,
 .font-root :lang(en),
 .font-root :lang(fr),
