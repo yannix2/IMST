@@ -83,6 +83,16 @@ describe("site photos", () => {
     }
   });
 
+  test("the film's transcript exists in every language, paragraph for paragraph", () => {
+    const t = JSON.parse(readFileSync(join(here, "admissions-film-transcript.json"), "utf8")) as Record<string, string>;
+    const paragraphs = (l: string) => t[l]!.split("\n").filter((p) => p.trim()).length;
+    for (const l of locales) {
+      expect(t[l]?.trim().length, l).toBeGreaterThan(1000);
+      expect(t[l]!.length, `${l} fits the 6000-character field`).toBeLessThanOrEqual(6000);
+      expect(paragraphs(l), l).toBe(paragraphs("en"));
+    }
+  });
+
   test("published media stay within budget", () => {
     expect(size(publicDir)).toBeLessThanOrEqual(25e6);
     expect(statSync(join(publicDir, "hero", "hero-landscape.mp4")).size).toBeLessThanOrEqual(4e6);

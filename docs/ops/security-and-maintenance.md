@@ -129,9 +129,10 @@ children).
    (a reviewer account; add `--publish` to show it at once). Or upload the files by hand in
    maarifcms and pick them in Home film.
 
-**Transcripts:** the film has English subtitles burned in. In Home film, switch the language at
-the top of the page and paste "What is said in the film" for each language (one paragraph per
-line). French, Arabic and Turkish visitors see it open under the player.
+**Transcripts:** the film has English subtitles burned in. Step 3 also pastes "What is said in
+the film" in all four languages from `tools/media/admissions-film-transcript.json`; to correct a
+word later, switch the language at the top of Home film in maarifcms and edit it there (one
+paragraph per line). French, Arabic and Turkish visitors see it open under the player.
 
 **A new film later:** put it in IMSTMEDIA, change `source` (and the shots) in
 `admissions-film.json`, run steps 1 to 3, and update the transcripts. maarifcms accepts videos

@@ -95,7 +95,12 @@ if (process.argv.includes("--film")) {
     console.log(`film  ${key.padEnd(18)} → media ${film[key]}`);
   }
   await api("/globals/home-hero", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(publish ? { ...film, published: true } : film) });
-  console.log(`\nHome film ${publish ? "published" : "saved (not shown until a reviewer ticks Show on the website)"}. Paste the transcripts in maarifcms > Content > Home film, one per language.`);
+  // "Read what is said": one transcript per language (admissions-film-transcript.json).
+  const transcript = JSON.parse(readFileSync(join(here, "admissions-film-transcript.json"), "utf8"));
+  for (const locale of locales) {
+    await api(`/globals/home-hero?locale=${locale}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ transcript: transcript[locale] }) });
+  }
+  console.log(`\nHome film ${publish ? "published" : "saved (not shown until a reviewer ticks Show on the website)"}, with its transcript in ${locales.join(", ")}.`);
   process.exit(0);
 }
 
