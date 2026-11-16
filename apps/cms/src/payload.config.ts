@@ -31,6 +31,7 @@ import { Applications } from './collections/Applications'
 import { Clubs } from './collections/Clubs'
 import { Documents } from './collections/Documents'
 import { Jobs } from './collections/Jobs'
+import { KeyDates } from './collections/KeyDates'
 import { PageVisuals } from './collections/PageVisuals'
 import { PrivateFiles } from './collections/PrivateFiles'
 import { Redirects } from './collections/Redirects'
@@ -40,6 +41,7 @@ import { Subscribers } from './collections/Subscribers'
 import { Gallery } from './globals/Gallery'
 import { HeadMessage } from './globals/HeadMessage'
 import { HomeHero } from './globals/HomeHero'
+import { Notice } from './globals/Notice'
 import { SchoolFacts } from './globals/SchoolFacts'
 import { SiteSettings } from './globals/SiteSettings'
 import { Timetables } from './globals/Timetables'
@@ -132,6 +134,7 @@ export default buildConfig({
     Testimonials,
     People,
     Documents,
+    KeyDates,
     Jobs,
     Applications,
     PrivateFiles,
@@ -140,7 +143,7 @@ export default buildConfig({
     Newsletters,
     AuditLog,
   ],
-  globals: [HeadMessage, HomeHero, Gallery, SchoolFacts, Timetables, SiteSettings],
+  globals: [HeadMessage, HomeHero, Gallery, SchoolFacts, Timetables, Notice, SiteSettings],
   // Nightly retention and backup, called by maarif-api's cron (endpoints/maintenance.ts).
   endpoints: [maintenance],
   localization: {

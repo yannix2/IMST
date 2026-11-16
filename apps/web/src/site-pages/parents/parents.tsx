@@ -3,7 +3,9 @@ import type { DocumentKind, SchoolDocument } from "@maarif/contracts/content";
 import type { Locale } from "@maarif/contracts/locales";
 import { messages } from "@/i18n/messages";
 import { pageNames } from "@/i18n/pages";
-import { getDocuments, getTimetable } from "@/lib/cms";
+import { getDocuments, getKeyDates, getTimetable } from "@/lib/cms";
+import { MyLevelMark } from "@/components/site/my-level-mark";
+import { AddToCalendar, KeyDateList, KeyDateRow, todayInTunis } from "./key-dates";
 import { campuses, telHref } from "@/lib/school";
 import { PageShell } from "@/components/site/page-shell";
 import { DraftNote, PageSection } from "@/components/site/blocks";
@@ -36,6 +38,7 @@ export function ParentsPage({ locale }: { locale: Locale }) {
       figure={contactFigure(locale)}
       body={
         <>
+          <Glance locale={locale} />
           <PageSection id="quick" tone="mist" title={c.quickTitle}>
             <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {quick.map(({ key, icon: Icon }) => (
@@ -66,6 +69,97 @@ export function ParentsPage({ locale }: { locale: Locale }) {
   );
 }
 
+// A school year such as "2026-2027" must read left to right inside Arabic text too (it printed
+// as "2027-2026"): wrap it in left-to-right isolate marks.
+const ltr = (text: string) => `\u2066${text}\u2069`;
+
+const moreLink ="inline-flex min-h-11 items-center gap-2 font-medium text-turquoise-ink";
+
+// The hub's first block (wave 6): the school hours and the calendar file, read on the server from
+// maarifcms. It shows only what the school has published; with nothing published it is absent,
+// and the calendar and hours pages keep their own "ask the office" notes.
+async function Glance({ locale }: { locale: Locale }) {
+  const c = parentsCopy[locale];
+  const t = messages[locale];
+  const p = pageNames[locale];
+  const [timetable, documents, keyDates] = await Promise.all([getTimetable(locale), getDocuments(locale, "all"), getKeyDates(locale)]);
+  const rows = timetable?.rows ?? [];
+  const calendar = (documents ?? []).find((d) => d.kind === "calendar");
+  // The next three dates that are not over yet.
+  const today = todayInTunis();
+  const next = (keyDates ?? []).filter((d) => (d.endsOn ?? d.startsOn) >= today).slice(0, 3);
+  if (rows.length === 0 && !calendar && next.length === 0) return null;
+  return (
+    <PageSection id="glance" title={c.glance.title}>
+      <div className="grid gap-10 lg:grid-cols-12">
+        {rows.length ? (
+          <div className="lg:col-span-7">
+            <h3 className="font-heading text-xl font-bold text-heading">
+              {c.glance.hours}
+              {timetable?.schoolYear ? <span className="ms-2 text-base font-normal text-slate tabular">{ltr(timetable.schoolYear)}</span> : null}
+            </h3>
+            <ul className="mt-3 divide-y divide-rule/70">
+              {rows.map((row, i) => (
+                // `data-mine` is set in the browser by MyLevelMark for the family's own level.
+                <li key={i} data-stage={row.stage} className="group relative -mx-3 flex items-baseline justify-between gap-6 px-3 py-4 data-[mine]:bg-turquoise-wash">
+                  <span className="absolute start-3 -top-2.5 hidden rounded-full bg-turquoise px-2.5 py-0.5 text-xs font-bold text-on-turquoise group-data-[mine]:block">{c.dates.myLevel}</span>
+                  <span className="flex min-w-0 flex-col">
+                    <span className="font-bold text-heading">{stageName(locale, row.stage)}</span>
+                    <span className="text-sm text-slate">
+                      {[row.days, row.campus ? (t.route.places[row.campus as keyof typeof t.route.places] ?? row.campus) : ""].filter(Boolean).join(" · ")}
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-lg font-bold text-heading tabular" dir="ltr">
+                    {row.start}–{row.end}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <MyLevelMark />
+            <a href={`/${locale}/parents/schedules`} className={moreLink}>
+              {c.glance.more}
+              <span className="sr-only">: {p.pages["parents/schedules"].title}</span>
+              <ArrowUpRightIcon aria-hidden="true" className="size-4 rtl:-scale-x-100" />
+            </a>
+          </div>
+        ) : null}
+        {calendar || next.length ? (
+          <div className="flex flex-col items-start gap-3 self-start rounded-[var(--radius-plate)] bg-mist p-7 lg:col-span-5">
+            <CalendarDaysIcon aria-hidden="true" className="size-8 text-turquoise-ink" strokeWidth={1.75} />
+            <h3 className="font-heading text-xl font-bold text-heading">{next.length ? c.dates.next : c.glance.calendar}</h3>
+            {next.length ? (
+              <ul className="w-full divide-y divide-rule/70">
+                {next.map((date) => (
+                  <KeyDateRow key={date.id} locale={locale} date={date} compact />
+                ))}
+              </ul>
+            ) : null}
+            {calendar ? (
+              <>
+                <p className="text-ink">{calendar.title}</p>
+                <p className="text-sm text-slate">
+                  {[calendar.schoolYear ? `${c.schoolYear} ${ltr(calendar.schoolYear)}` : "", calendar.bytes ? c.pdf(formatBytes(locale, calendar.bytes)) : ""].filter(Boolean).join(" · ")}
+                </p>
+                <Button asChild variant={next.length ? "outline" : "default"} className="mt-2">
+                  <a href={calendar.href} download>
+                    <DownloadIcon data-icon="inline-start" />
+                    {c.download}
+                  </a>
+                </Button>
+              </>
+            ) : null}
+            <a href={`/${locale}/parents/calendar`} className={moreLink}>
+              {c.glance.more}
+              <span className="sr-only">: {p.pages["parents/calendar"].title}</span>
+              <ArrowUpRightIcon aria-hidden="true" className="size-4 rtl:-scale-x-100" />
+            </a>
+          </div>
+        ) : null}
+      </div>
+    </PageSection>
+  );
+}
+
 function formatBytes(locale: Locale, bytes: number | null): string {
   if (!bytes) return "";
   const nf = new Intl.NumberFormat(locale === "ar" ? "ar-TN-u-nu-latn" : locale, { maximumFractionDigits: 1 });
@@ -82,7 +176,7 @@ function DocumentList({ locale, docs }: { locale: Locale; docs: SchoolDocument[]
             <h2 className="font-heading text-xl font-bold text-heading">{doc.title}</h2>
             {doc.summary ? <p className="text-slate">{doc.summary}</p> : null}
             <p className="text-sm text-slate">
-              {[doc.schoolYear ? `${c.schoolYear} ${doc.schoolYear}` : "", doc.validUntil ? `${c.validUntil} ${formatDate(locale, doc.validUntil)}` : "", doc.bytes ? c.pdf(formatBytes(locale, doc.bytes)) : ""]
+              {[doc.schoolYear ? `${c.schoolYear} ${ltr(doc.schoolYear)}` : "", doc.validUntil ? `${c.validUntil} ${formatDate(locale, doc.validUntil)}` : "", doc.bytes ? c.pdf(formatBytes(locale, doc.bytes)) : ""]
                 .filter(Boolean)
                 .join(" · ")}
             </p>
@@ -137,8 +231,43 @@ async function DocumentsPage({ locale, page, kinds, empty }: { locale: Locale; p
   );
 }
 
-export function CalendarPage({ locale }: { locale: Locale }) {
-  return <DocumentsPage locale={locale} page="parents/calendar" kinds={["calendar"]} empty={parentsCopy[locale].empty.calendar} />;
+// Calendar (wave 6): the key dates staff enter in maarifcms, by month, with "Add to my calendar";
+// then the official calendar file. With neither, the "ask the office" note as before.
+export async function CalendarPage({ locale }: { locale: Locale }) {
+  const c = parentsCopy[locale];
+  const [keyDates, all] = await Promise.all([getKeyDates(locale), getDocuments(locale, "all")]);
+  const dates = keyDates ?? [];
+  const docs = (all ?? []).filter((d) => d.kind === "calendar");
+  return (
+    <PageShell
+      locale={locale}
+      page="parents/calendar"
+      lede={c.ledes.calendar}
+      figure={contactFigure(locale)}
+      body={
+        <>
+          {dates.length ? (
+            <PageSection id="dates" title={c.dates.title}>
+              <AddToCalendar locale={locale} />
+              <KeyDateList locale={locale} dates={dates} />
+            </PageSection>
+          ) : null}
+          {docs.length || dates.length === 0 ? (
+            <PageSection id="documents" tone="mist" title={dates.length ? c.dates.pdfTitle : undefined}>
+              {docs.length ? (
+                <DocumentList locale={locale} docs={docs} />
+              ) : (
+                <>
+                  <EmptyState text={c.empty.calendar} />
+                  <AskOffice locale={locale} />
+                </>
+              )}
+            </PageSection>
+          ) : null}
+        </>
+      }
+    />
+  );
 }
 
 export function HandbookPage({ locale }: { locale: Locale }) {
@@ -163,7 +292,7 @@ export async function SchedulesPage({ locale }: { locale: Locale }) {
               <table className="w-full min-w-[36rem] text-start">
                 {timetable?.schoolYear ? (
                   <caption className="px-6 pt-5 text-start text-sm text-slate">
-                    {c.schoolYear} {timetable.schoolYear}
+                    {c.schoolYear} {ltr(timetable.schoolYear)}
                   </caption>
                 ) : null}
                 <thead>

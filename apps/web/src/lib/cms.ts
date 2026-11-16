@@ -10,8 +10,10 @@ import type {
   HomeHero,
   Job,
   JobSummary,
+  KeyDate,
   NewsArticle,
   NewsPage,
+  Notice,
   PageVisual,
   PageVisuals,
   SchoolDocument,
@@ -87,6 +89,8 @@ export const getDocuments = cached<[Locale, DocumentKind | "all"], SchoolDocumen
   (l, kind) => `/api/content/documents${q(l, kind === "all" ? {} : { kind })}`,
 );
 export const getTimetable = cached<[Locale], Timetable>("timetable", () => ["timetables"], (l) => `/api/content/timetable${q(l)}`);
+export const getKeyDates = cached<[Locale], KeyDate[]>("key-dates", () => ["key-dates"], (l) => `/api/content/key-dates${q(l)}`);
+export const getNotice = cached<[Locale], Notice>("notice", () => ["notice"], (l) => `/api/content/notice${q(l)}`);
 export const getJobs = cached<[Locale], JobSummary[]>("jobs", () => ["jobs"], (l) => `/api/content/jobs${q(l)}`);
 export const getJob = cached<[Locale, string], Job>("job", (_l, slug) => ["jobs", `jobs:${slug}`], (l, slug) => `/api/content/jobs/${slug}${q(l)}`);
 export const getCmsPage = cached<[Locale, string], CmsPage>("page", (_l, slug) => ["pages", `pages:${slug}`], (l, slug) => `/api/content/pages/${slug}${q(l)}`);

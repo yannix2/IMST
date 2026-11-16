@@ -13,6 +13,7 @@ import { RememberLocale } from "@/components/landing/remember-locale";
 import { SiteFooter } from "@/components/landing/site-footer";
 import { SiteHeader } from "@/components/landing/site-header";
 import { StickyHeader } from "@/components/landing/sticky-header";
+import { NoticeBar } from "@/components/site/notice-bar";
 import { PageHero } from "./page-hero";
 import { PhotoBand } from "./photo-band";
 import { TourGate } from "./tour-gate";
@@ -37,6 +38,7 @@ export function PageShell({ body, band = true, ...hero }: Props) {
       >
         {t.skipToContent}
       </a>
+      <NoticeBar locale={locale} />
       <StickyHeader>
         <div className="mx-auto max-w-[var(--content-max)] px-[var(--gutter)]">
           <SiteHeader locale={locale} path={path} />

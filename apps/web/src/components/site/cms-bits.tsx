@@ -7,7 +7,7 @@ import { SocialLinks } from "./social-links";
 // Small pieces the wave 3 CMS pages share: dates in the page language (Western digits in Arabic,
 // DESIGN.md), stage names, and the honest empty state shown while staff have published nothing.
 
-const dateTag: Record<Locale, string> = { en: "en-GB", fr: "fr-FR", ar: "ar-TN-u-nu-latn", tr: "tr-TR" };
+export const dateTag: Record<Locale, string> = { en: "en-GB", fr: "fr-FR", ar: "ar-TN-u-nu-latn", tr: "tr-TR" };
 
 export function formatDate(locale: Locale, iso: string | null | undefined, withTime = false): string {
   if (!iso) return "";

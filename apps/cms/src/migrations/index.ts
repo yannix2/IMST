@@ -4,6 +4,7 @@ import * as migration_20261105_122920_about_content from './20261105_122920_abou
 import * as migration_20261109_104831_wave3_content from './20261109_104831_wave3_content';
 import * as migration_20261110_083548_wave4_email from './20261110_083548_wave4_email';
 import * as migration_20261110_132122_wave5_home_film from './20261110_132122_wave5_home_film';
+import * as migration_20261116_110219_wave6_parents from './20261116_110219_wave6_parents';
 
 export const migrations = [
   {
@@ -34,6 +35,11 @@ export const migrations = [
   {
     up: migration_20261110_132122_wave5_home_film.up,
     down: migration_20261110_132122_wave5_home_film.down,
-    name: '20261110_132122_wave5_home_film'
+    name: '20261110_132122_wave5_home_film',
+  },
+  {
+    up: migration_20261116_110219_wave6_parents.up,
+    down: migration_20261116_110219_wave6_parents.down,
+    name: '20261116_110219_wave6_parents'
   },
 ];

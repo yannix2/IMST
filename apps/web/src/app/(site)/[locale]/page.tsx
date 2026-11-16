@@ -14,6 +14,7 @@ import { Foundation } from "@/components/landing/foundation";
 import { Journey } from "@/components/landing/journey";
 import { LevelsBand } from "@/components/landing/levels-band";
 import { StickyHeader } from "@/components/landing/sticky-header";
+import { NoticeBar } from "@/components/site/notice-bar";
 import { RememberLocale } from "@/components/landing/remember-locale";
 import { StickyCta } from "@/components/landing/sticky-cta";
 import { Hero, HeroProof } from "@/components/landing/hero";
@@ -72,6 +73,7 @@ export default async function HomePage({ params }: Props) {
       >
         {t.skipToContent}
       </a>
+      <NoticeBar locale={locale} />
       <StickyHeader>
         <div className="mx-auto max-w-[var(--content-max)] px-[var(--gutter)]">
           <SiteHeader locale={locale} />

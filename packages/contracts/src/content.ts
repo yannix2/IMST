@@ -136,6 +136,13 @@ export type Job = JobSummary & { body: RichBlock[]; startsOn: string | null };
 export type TimetableRow = { stage: string; campus: string | null; days: string; start: string; end: string; note: string };
 export type Timetable = { schoolYear: string; rows: TimetableRow[] };
 
+// Wave 6: key dates of the school year (whole days, "YYYY-MM-DD"; endsOn is the last day, or null
+// for a single day) and the notice bar above every page.
+export const keyDateKinds = ["term", "holiday", "exam", "meeting", "event", "other"] as const;
+export type KeyDateKind = (typeof keyDateKinds)[number];
+export type KeyDate = { id: string; kind: KeyDateKind; title: string; note: string; startsOn: string; endsOn: string | null; stages: string[]; campus: string | null };
+export type Notice = { text: string; href: string | null };
+
 export type CmsPage = { slug: string; title: string; body: RichBlock[]; updatedAt: string; seo: { title: string; description: string } };
 
 /** Slugs the site pre-renders (news, albums, jobs) and the redirects staff set in maarifcms. */

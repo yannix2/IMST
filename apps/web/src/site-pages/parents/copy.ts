@@ -1,3 +1,4 @@
+import type { KeyDateKind } from "@maarif/contracts/content";
 import type { Locale } from "@maarif/contracts/locales";
 
 // Words of the Parents pages (wave 3, D3). Documents, hours and the menu come from maarifcms.
@@ -7,6 +8,10 @@ export type ParentsCopy = {
   lede: string;
   quickTitle: string;
   menuTitle: string;
+  // The hub's "Hours and dates" block (wave 6): shown only when the school has published them.
+  glance: { title: string; hours: string; calendar: string; more: string };
+  // Key dates of the year (wave 6, from maarifcms) and the "your child's level" mark on the hours.
+  dates: { title: string; add: string; addNote: string; pdfTitle: string; next: string; kinds: Record<KeyDateKind, string>; myLevel: string };
   ledes: { calendar: string; schedules: string; menu: string; handbook: string; feedback: string };
   download: string;
   pdf: (size: string) => string;
@@ -39,6 +44,8 @@ export const parentsCopy: Record<Locale, ParentsCopy> = {
     lede: "Everything families need during the school year: the calendar, school hours, the canteen menu, the handbook and a direct line to the school.",
     quickTitle: "For families",
     menuTitle: "This week at the canteen",
+    glance: { title: "Hours and dates", hours: "School hours", calendar: "School calendar", more: "See details" },
+    dates: { title: "Key dates", add: "Add to my calendar", addNote: "Opens in the calendar of your phone or computer.", pdfTitle: "Calendar to download", next: "Coming up", kinds: { term: "Term", holiday: "Holiday", exam: "Exams", meeting: "Parents’ meeting", event: "School event", other: "" }, myLevel: "Your child’s level" },
     ledes: {
       calendar: "Holidays, exam periods and the key dates of the school year.",
       schedules: "Start and end times for each level and campus.",
@@ -83,6 +90,8 @@ export const parentsCopy: Record<Locale, ParentsCopy> = {
     lede: "Tout ce dont les familles ont besoin pendant l’année : le calendrier, les horaires, le menu de la cantine, le guide des parents et un lien direct avec l’école.",
     quickTitle: "Pour les familles",
     menuTitle: "Cette semaine à la cantine",
+    glance: { title: "Horaires et dates", hours: "Horaires de l’école", calendar: "Calendrier scolaire", more: "Voir le détail" },
+    dates: { title: "Dates clés", add: "Ajouter à mon agenda", addNote: "S’ouvre dans l’agenda de votre téléphone ou de votre ordinateur.", pdfTitle: "Calendrier à télécharger", next: "À venir", kinds: { term: "Trimestre", holiday: "Vacances", exam: "Examens", meeting: "Réunion parents", event: "Événement", other: "" }, myLevel: "Le niveau de votre enfant" },
     ledes: {
       calendar: "Les vacances, les périodes d’examens et les dates clés de l’année scolaire.",
       schedules: "Les heures d’entrée et de sortie par niveau et par campus.",
@@ -127,6 +136,8 @@ export const parentsCopy: Record<Locale, ParentsCopy> = {
     lede: "كل ما تحتاجه العائلات خلال السنة الدراسية: الرزنامة، والتوقيت المدرسي، وقائمة طعام المطعم، ودليل الأولياء، وخط مباشر مع المدرسة.",
     quickTitle: "للعائلات",
     menuTitle: "هذا الأسبوع في المطعم",
+    glance: { title: "التوقيت والمواعيد", hours: "التوقيت المدرسي", calendar: "الرزنامة المدرسية", more: "عرض التفاصيل" },
+    dates: { title: "المواعيد المهمة", add: "إضافة إلى تقويمي", addNote: "يُفتح في تقويم هاتفكم أو حاسوبكم.", pdfTitle: "الرزنامة للتحميل", next: "المواعيد القادمة", kinds: { term: "فترة دراسية", holiday: "عطلة", exam: "امتحانات", meeting: "لقاء الأولياء", event: "نشاط مدرسي", other: "" }, myLevel: "مرحلة طفلكم" },
     ledes: {
       calendar: "العطل وفترات الامتحانات والمواعيد المهمة في السنة الدراسية.",
       schedules: "مواعيد الدخول والخروج لكل مرحلة وفرع.",
@@ -171,6 +182,8 @@ export const parentsCopy: Record<Locale, ParentsCopy> = {
     lede: "Ailelerin okul yılı boyunca ihtiyaç duyduğu her şey: takvim, okul saatleri, yemekhane menüsü, veli el kitabı ve okulla doğrudan iletişim.",
     quickTitle: "Aileler için",
     menuTitle: "Bu hafta yemekhanede",
+    glance: { title: "Saatler ve tarihler", hours: "Okul saatleri", calendar: "Okul takvimi", more: "Ayrıntıları gör" },
+    dates: { title: "Önemli tarihler", add: "Takvimime ekle", addNote: "Telefonunuzun ya da bilgisayarınızın takviminde açılır.", pdfTitle: "İndirilebilir takvim", next: "Yaklaşan tarihler", kinds: { term: "Dönem", holiday: "Tatil", exam: "Sınavlar", meeting: "Veli toplantısı", event: "Okul etkinliği", other: "" }, myLevel: "Çocuğunuzun düzeyi" },
     ledes: {
       calendar: "Tatiller, sınav dönemleri ve okul yılının önemli tarihleri.",
       schedules: "Her düzey ve kampüs için giriş ve çıkış saatleri.",

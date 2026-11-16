@@ -1,4 +1,4 @@
-# Admin protection, nightly maintenance, email and the Home film (waves 3 to 5)
+# Admin protection, nightly maintenance, email, the Home film, key dates and notices (waves 3 to 6)
 
 For the IT manager. There is no staging copy (owner decision 2026-11-09): the demo domain is the test site until the school's own domain.
 
@@ -137,3 +137,21 @@ paragraph per line). French, Arabic and Turkish visitors see it open under the p
 **A new film later:** put it in IMSTMEDIA, change `source` (and the shots) in
 `admissions-film.json`, run steps 1 to 3, and update the transcripts. maarifcms accepts videos
 up to 30 MB and other files up to 10 MB.
+
+## 5. Key dates and the notice bar (wave 6)
+
+### Key dates, for staff
+
+1. In maarifcms open **Parents > Key dates (calendar)** and add a date: title, kind (holiday, exams, meeting...), first day, and a last day when it lasts several days. Levels, campus and a note are optional.
+2. Write the title in each language and set that language's **Translation status** to Ready. A language left as Draft does not show the date.
+3. An editor saves a draft; a reviewer publishes. The site refreshes within a few minutes.
+
+Where they appear: the Calendar page (`/parents/calendar`) lists them by month, the Parents page shows the next three, and **Add to my calendar** gives families a calendar file (`/api/calendar/key-dates.ics?locale=en`). A date disappears from the site once the month after it has started. Whole days only: put times in the note. The PDF calendar in Documents stays the official version; keep both in step.
+
+Families who added the file earlier do not receive later changes by themselves: after an important change, tell them (notice bar, newsletter) so they download it again.
+
+### Notice bar, for staff
+
+**Parents > Notice bar**: one short sentence in each of the four languages (a language with no text shows no notice), an optional link (`/parents/calendar` or a full `https://` address) and **Show until**, the last day it is shown. An editor can write it; only a reviewer can tick **Show on the website**. It appears above the header of every page in the school's notice colour and hides itself after the last day. Take it down by unticking the box.
+
+Use it for things families must know today (a closure, changed hours). For ordinary news use News.

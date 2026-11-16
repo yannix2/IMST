@@ -83,6 +83,7 @@ export interface Config {
     testimonials: Testimonial;
     people: Person;
     documents: Document;
+    'key-dates': KeyDate;
     jobs: Job;
     applications: Application;
     'private-files': PrivateFile;
@@ -112,6 +113,7 @@ export interface Config {
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     people: PeopleSelect<false> | PeopleSelect<true>;
     documents: DocumentsSelect<false> | DocumentsSelect<true>;
+    'key-dates': KeyDatesSelect<false> | KeyDatesSelect<true>;
     jobs: JobsSelect<false> | JobsSelect<true>;
     applications: ApplicationsSelect<false> | ApplicationsSelect<true>;
     'private-files': PrivateFilesSelect<false> | PrivateFilesSelect<true>;
@@ -135,6 +137,7 @@ export interface Config {
     gallery: Gallery;
     'school-facts': SchoolFact;
     timetables: Timetable;
+    notice: Notice;
     'site-settings': SiteSetting;
   };
   globalsSelect: {
@@ -143,6 +146,7 @@ export interface Config {
     gallery: GallerySelect<false> | GallerySelect<true>;
     'school-facts': SchoolFactsSelect<false> | SchoolFactsSelect<true>;
     timetables: TimetablesSelect<false> | TimetablesSelect<true>;
+    notice: NoticeSelect<false> | NoticeSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: 'en' | 'fr' | 'ar' | 'tr';
@@ -755,6 +759,36 @@ export interface Document {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "key-dates".
+ */
+export interface KeyDate {
+  id: number;
+  /**
+   * For example: Winter holiday, First day of school, Parent-teacher meetings.
+   */
+  title: string;
+  kind: 'term' | 'holiday' | 'exam' | 'meeting' | 'event' | 'other';
+  startsOn: string;
+  /**
+   * Leave empty for a single day.
+   */
+  endsOn?: string | null;
+  stages?: ('kindergarten' | 'primary' | 'lower-secondary' | 'upper-secondary')[] | null;
+  campus?: ('schools' | 'highSchool') | null;
+  /**
+   * Optional: times, place, what families should bring.
+   */
+  note?: string | null;
+  /**
+   * A language is shown on the site only when Ready or Proofread.
+   */
+  translationStatus: 'draft' | 'ready' | 'proofread';
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "jobs".
  */
 export interface Job {
@@ -1027,6 +1061,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'documents';
         value: number | Document;
+      } | null)
+    | ({
+        relationTo: 'key-dates';
+        value: number | KeyDate;
       } | null)
     | ({
         relationTo: 'jobs';
@@ -1441,6 +1479,23 @@ export interface DocumentsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "key-dates_select".
+ */
+export interface KeyDatesSelect<T extends boolean = true> {
+  title?: T;
+  kind?: T;
+  startsOn?: T;
+  endsOn?: T;
+  stages?: T;
+  campus?: T;
+  note?: T;
+  translationStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "jobs_select".
  */
 export interface JobsSelect<T extends boolean = true> {
@@ -1713,6 +1768,28 @@ export interface Timetable {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notice".
+ */
+export interface Notice {
+  id: number;
+  active?: boolean | null;
+  /**
+   * The last day the notice is shown. Leave empty to hide it by hand.
+   */
+  until?: string | null;
+  /**
+   * One short sentence. A language with no text shows no notice: write it in all four.
+   */
+  text?: string | null;
+  /**
+   * Optional. A page of the site without the language, for example /parents/calendar, or a full https:// address.
+   */
+  link?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "site-settings".
  */
 export interface SiteSetting {
@@ -1843,6 +1920,19 @@ export interface TimetablesSelect<T extends boolean = true> {
         note?: T;
         id?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notice_select".
+ */
+export interface NoticeSelect<T extends boolean = true> {
+  active?: T;
+  until?: T;
+  text?: T;
+  link?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

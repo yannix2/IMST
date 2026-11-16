@@ -22,7 +22,9 @@ export function NewsletterSlot({ locale, privacyHref, privacyLabel }: { locale: 
   }, []);
 
   return (
-    <div ref={ref} className="min-h-[13.5rem] sm:min-h-[10.5rem]">
+    // Measured 2026-11-16: the form is 233 to 253 px on phones (273 only in French at 320) and
+    // 177 px from 640 up. The earlier 216 / 168 let the footer's last row jump on a fast scroll.
+    <div ref={ref} className="min-h-[15.875rem] sm:min-h-[11.125rem]">
       {near ? <NewsletterForm locale={locale} privacyHref={privacyHref} privacyLabel={privacyLabel} /> : null}
     </div>
   );

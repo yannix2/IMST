@@ -23,6 +23,7 @@ import {
   readTimetable,
   readTrips,
 } from "./content-wave3";
+import { keyDatesCalendar, readKeyDates, readNotice } from "./content-wave6";
 import type { Env } from "./env";
 import { confirmToSender, notifyStaff } from "./notify";
 import { revalidate } from "./revalidate";
@@ -251,6 +252,26 @@ app.get(
   }),
 );
 app.get("/api/content/timetable", content((env, locale) => readTimetable(env, locale)));
+// Wave 6: key dates of the school year, the same dates as a calendar file, and the notice bar.
+app.get("/api/content/key-dates", content((env, locale) => readKeyDates(env, locale)));
+app.get("/api/content/notice", content((env, locale) => readNotice(env, locale)));
+app.get("/api/calendar/key-dates.ics", async (c) => {
+  const locale = c.req.query("locale");
+  if (!locale || !isLocale(locale)) return c.json({ ok: false, error: "invalid" }, 400);
+  const dates = await readKeyDates(c.env, locale);
+  if (dates.length === 0) return c.json({ ok: false, error: "not_found" }, 404);
+  let host = "maarif";
+  try {
+    host = new URL(c.env.SITE_URL ?? "").hostname;
+  } catch {
+    // No site address set: the identifiers stay valid, only less specific.
+  }
+  return c.body(keyDatesCalendar(dates, locale, host), 200, {
+    "content-type": "text/calendar; charset=utf-8",
+    "content-disposition": 'attachment; filename="maarif-key-dates.ics"',
+    "cache-control": CONTENT_CACHE,
+  });
+});
 // No language: the same for every page. Cached briefly at the edge; staff changes show within minutes.
 app.get("/api/content/site-config", async (c) => c.json(await readSiteConfig(c.env), 200, { "cache-control": "public, max-age=300" }));
 app.get("/api/content/jobs", content((env, locale) => readJobs(env, locale)));
